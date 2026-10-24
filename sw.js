@@ -1,7 +1,7 @@
 // Network-first so new deployments show up immediately; falls back to the cache when offline.
-const CACHE = "epw-v1";
+const CACHE = "epw-v3";
 const FILES = [
-  "./", "index.html", "style.css", "js/game.js", "js/ui.js",
+  "./", "index.html", "style.css", "js/game.js", "js/tutorial.js", "js/title.js", "js/ui.js",
   "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png",
 ];
 

@@ -290,6 +290,25 @@ function drawCitizen(ctx, owner, cx, cy, radius, mood, alpha = 1, scale = 1) {
   ctx.lineTo(cx + r * 0.45, cy - r * 0.75);
   ctx.closePath();
   ctx.fill();
+  if (mood === "dead") {
+    ctx.strokeStyle = "#222";
+    ctx.lineWidth = Math.max(1, r * 0.1);
+    const er = r * 0.14;
+    for (const dx of [-0.35, 0.35]) {
+      const ex = cx + dx * r;
+      const ey = cy - r * 0.2;
+      ctx.beginPath();
+      ctx.moveTo(ex - er, ey - er); ctx.lineTo(ex + er, ey + er);
+      ctx.moveTo(ex - er, ey + er); ctx.lineTo(ex + er, ey - er);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "#222";
+    ctx.beginPath();
+    ctx.ellipse(cx, cy + r * 0.42, r * 0.18, r * 0.175, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
   ctx.fillStyle = "#fff";
   for (const dx of [-0.35, 0.35]) {
     ctx.beginPath();
@@ -617,14 +636,10 @@ function renderHand() {
 }
 
 function renderScoreboard() {
-  const living = [0, 1].map((o) => game.citizens.filter((c) => c.owner === o).length);
   [0, 1].forEach((o) => {
     const el = $(`score${o}`);
     el.classList.toggle("active", o === game.actingPlayer() && !game.gameOver);
-    $(`alive${o}`).textContent = living[o];
-    $(`lost${o}`).textContent = game.destroyed[o];
     $(`points${o}`).textContent = game.destroyed[1 - o];
-    $(`tiles${o}`).textContent = `${game.decks[o].length}/${game.deckTotal}`;
     $(`bar${o}`).style.width = `${(100 * game.decks[o].length) / game.deckTotal}%`;
     $(`who${o}`).textContent = game.isCpu(o) ? `CPU ${game.difficulty[o]}` : "Human";
   });
@@ -642,7 +657,36 @@ function renderCycle() {
     }
   }
   [...row.children].forEach((chip, i) => chip.classList.toggle("now", i + 1 === game.eventPosition));
-  $("cycleText").textContent = game.cycleMilestoneText();
+
+  const counts = $("countRow");
+  const total = game.totalCycles;
+  if (counts.children.length !== total) {
+    counts.innerHTML = "";
+    counts.style.gridTemplateColumns = `repeat(${total}, 1fr)`;
+    for (let n = 1; n <= total; n++) {
+      const chip = document.createElement("div");
+      chip.className = "count";
+      if (n === total) chip.classList.add("end");
+      else if (n >= FULL_BOARD_CYCLES && (n - FULL_BOARD_CYCLES) % FACTORY_CYCLE_INTERVAL === 0) chip.classList.add("key");
+      chip.innerHTML = `<b>${n}</b>`;
+      counts.appendChild(chip);
+    }
+  }
+  const done = Math.floor(game.eventSteps / EVENT_CYCLE_LENGTH);
+  [...counts.children].forEach((chip, i) => {
+    chip.classList.toggle("done", i < done);
+    chip.classList.toggle("now", i === done && !game.gameOver);
+  });
+}
+
+function fitMessage() {
+  const box = $("message");
+  let size = 15;
+  box.style.fontSize = `${size}px`;
+  while (size > 8 && box.scrollHeight > box.clientHeight + 1) {
+    size -= 0.5;
+    box.style.fontSize = `${size}px`;
+  }
 }
 
 function render() {
@@ -658,6 +702,7 @@ function render() {
   if (game.gameOver) text = "Game over";
   header.textContent = text;
   $("message").textContent = game.message;
+  fitMessage();
   renderScoreboard();
   renderCycle();
   renderHand();
@@ -765,9 +810,12 @@ function setupSetupPanel() {
   $("p1mode").addEventListener("change", (e) => { settings.p1 = e.target.value; saveSettings(); });
   $("speed").addEventListener("change", (e) => { settings.speed = Number(e.target.value); saveSettings(); });
   $("startBtn").addEventListener("click", startGame);
-  $("rulesBtn").addEventListener("click", () => { $("rulesBack").dataset.back = "setupPanel"; showOverlay("rulesPanel"); });
-  $("menuRules").addEventListener("click", () => { $("rulesBack").dataset.back = "menuPanel"; showOverlay("rulesPanel"); });
-  $("rulesBack").addEventListener("click", () => showOverlay($("rulesBack").dataset.back));
+  $("rulesBtn").addEventListener("click", () => { $("rulesBack").dataset.back = "setupPanel"; showOverlay("rulesPanel"); openTutorial(); });
+  $("menuRules").addEventListener("click", () => { $("rulesBack").dataset.back = "menuPanel"; showOverlay("rulesPanel"); openTutorial(); });
+  $("rulesBack").addEventListener("click", () => {
+    const back = $("rulesBack").dataset.back;
+    if (back === "title") hideOverlay(); else showOverlay(back);
+  });
   $("menuBtn").addEventListener("click", () => showOverlay("menuPanel"));
   $("menuClose").addEventListener("click", hideOverlay);
   $("menuNew").addEventListener("click", () => { sync(); showOverlay("setupPanel"); });
@@ -807,9 +855,18 @@ function setupControls() {
 window.addEventListener("load", () => {
   setupSetupPanel();
   setupControls();
+  setupTutorial();
   layout();
-  showOverlay("setupPanel");
-  requestAnimationFrame(drawFrame);
+  showOverlay(null);
+  $("title").hidden = false;
+  renderTitle();
+  window.addEventListener("resize", renderTitle);
+  $("titleStart").addEventListener("click", () => { $("title").hidden = true; showOverlay("setupPanel"); });
+  $("titleRules").addEventListener("click", () => {
+    $("rulesBack").dataset.back = "title";
+    showOverlay("rulesPanel");
+    openTutorial();
+  });
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   }

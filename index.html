@@ -27,30 +27,18 @@
     <section id="panel">
       <div id="scoreboard">
         <div class="score" id="score0" style="--team:#e0452a;--tint:#fdeee9">
-          <div class="name">Fire Folk (FF) <small id="who0"></small></div>
-          <div class="nums">
-            <div><b id="alive0">0</b><small>Alive</small></div>
-            <div><b id="lost0">0</b><small>Lost</small></div>
-            <div><b id="points0">0</b><small>Score</small></div>
-          </div>
+          <div class="name"><span>Fire Folk <small id="who0"></small></span><b id="points0">0</b></div>
           <div class="deck"><div class="bar" id="bar0"></div></div>
-          <small>Tiles left: <span id="tiles0"></span></small>
         </div>
         <div class="score" id="score1" style="--team:#2f8fd8;--tint:#e8f3fc">
-          <div class="name">Ice Inhabitants (II) <small id="who1"></small></div>
-          <div class="nums">
-            <div><b id="alive1">0</b><small>Alive</small></div>
-            <div><b id="lost1">0</b><small>Lost</small></div>
-            <div><b id="points1">0</b><small>Score</small></div>
-          </div>
+          <div class="name"><span>Ice Inhabitants <small id="who1"></small></span><b id="points1">0</b></div>
           <div class="deck"><div class="bar" id="bar1"></div></div>
-          <small>Tiles left: <span id="tiles1"></span></small>
         </div>
       </div>
 
       <div id="cycle">
         <div id="cycleRow"></div>
-        <pre id="cycleText"></pre>
+        <div id="countRow"></div>
       </div>
     </section>
 
@@ -64,6 +52,15 @@
       </div>
     </section>
   </main>
+
+  <div id="title">
+    <div id="titleStage"><canvas id="titleCanvas"></canvas></div>
+    <div id="titleHint">&#8635; Turn your phone sideways for a bigger view</div>
+    <div id="titleButtons">
+      <button id="titleStart">Start Game</button>
+      <button id="titleRules">How to Play</button>
+    </div>
+  </div>
 
   <div id="overlay" hidden>
     <div class="panel" id="setupPanel" hidden>
@@ -103,25 +100,16 @@
     </div>
 
     <div class="panel" id="rulesPanel" hidden>
-      <h2>How to play</h2>
-      <div class="rules">
-        <p>Redirect fire (Fire Folk) or water (Ice Inhabitants) through pipes to destroy the enemy's citizens. Most citizens destroyed wins.</p>
-        <h4>Your turn</h4>
-        <ul>
-          <li>Tap a tile in your hand. Pipes: tap a board space to preview, <b>Rotate</b> as needed, then tap the same space again to confirm. Green dots show legal spaces.</li>
-          <li>A pipe must touch an existing pipe or factory; touching sides must both be open or both closed. A pipe may never carry both fire and water.</li>
-          <li><b>Bomb</b> destroys any pipe. <b>Construction</b> replaces a pipe permanently (not one fed directly by a factory).</li>
-          <li><b>Move 1/2/3</b>: tap your citizen, then a clear destination within that many steps.</li>
-          <li><b>Doubleplay</b>: tap it twice. You must then play all your other tiles (plus extras drawn).</li>
-          <li>A tile with no legal move can be <b>Discarded</b> (it's replaced, no turn used).</li>
-          <li>Tap <b>End turn</b> when done.</li>
-        </ul>
-        <h4>Event cycle</h4>
-        <p>After both players move, the counter advances. Space 4: both place a citizen. 6/8: Fire places. 7/9: Ice places. 10: factories produce &mdash; every citizen next to the open end of an enemy pipe is destroyed, along with any same-team citizens touching them (chain).</p>
-        <p>Citizens go within 2 steps of your factories or star (spawn) pipe tiles. For the first 2 cycles everything stays inside the centre 8&times;8 grid; then the board opens and each side places a new factory, repeating every 2 cycles.</p>
-        <p>Tip: use the &#128269; button to zoom the board and drag to pan.</p>
+      <h2 id="tutTitle">How to play</h2>
+      <div id="tutStep"></div>
+      <div id="tutDiagram"><canvas id="tutCanvas"></canvas></div>
+      <div id="tutBody" class="rules"></div>
+      <div class="row tutnav">
+        <button id="tutPrev">&#9664; Back</button>
+        <button id="tutNext">Next &#9654;</button>
       </div>
-      <button id="rulesBack" class="primary" data-back="setupPanel">Back</button>
+      <div id="tutDots"></div>
+      <button id="rulesBack" class="primary" data-back="setupPanel">Close</button>
     </div>
 
     <div class="panel" id="overPanel" hidden>
@@ -134,6 +122,8 @@
   </div>
 
   <script src="js/game.js"></script>
+  <script src="js/tutorial.js"></script>
+  <script src="js/title.js"></script>
   <script src="js/ui.js"></script>
 </body>
 </html>

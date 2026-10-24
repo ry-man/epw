@@ -8,31 +8,36 @@ header { display: flex; gap: 6px; padding: 6px; padding-top: calc(6px + env(safe
 #turn { flex: 1; color: #fff; font-weight: 700; padding: 8px 10px; border-radius: 6px; background: #555; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hbtn { background: #4a433c; color: #fff; border: 0; border-radius: 6px; padding: 0 12px; }
 
-#boardCol { display: flex; flex-direction: column; flex: 0 0 auto; }
-#boardWrap { width: 100%; aspect-ratio: 1 / 1; max-height: 52vh; align-self: center; overflow: auto; background: #d9d4c6; touch-action: pan-x pan-y; }
+#boardCol { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; }
+#boardWrap { width: 100%; flex: 1 1 0; min-height: 120px; max-height: 60vh; align-self: center; overflow: auto; background: #d9d4c6; touch-action: pan-x pan-y; }
 #board { display: block; margin: 0 auto; }
-#message { min-height: 3.2em; padding: 6px 10px; font-size: 0.85rem; line-height: 1.25; background: #fff8e1; border-bottom: 1px solid #ddd; }
+#message { flex: 0 0 auto; height: 52px; display: flex; align-items: center; overflow: hidden; padding: 4px 10px; font-size: 15px; line-height: 1.2; background: #fff8e1; border-bottom: 1px solid #ddd; }
 
-#panel { flex: 1; min-height: 0; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 8px; }
+#panel { flex: 0 0 auto; padding: 8px; display: flex; flex-direction: column; gap: 8px; }
 #dock { flex: 0 0 auto; padding: 8px; background: #e6e1d4; border-top: 1px solid #c9c2b0; display: flex; flex-direction: column; gap: 8px; }
 #scoreboard { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.score { background: var(--tint); border: 2px solid var(--team); border-radius: 8px; padding: 6px; font-size: 0.8rem; }
+.score { background: var(--tint); border: 2px solid var(--team); border-radius: 8px; padding: 4px; font-size: 0.8rem; }
 .score.active { box-shadow: 0 0 0 3px var(--team); }
-.score .name { background: var(--team); color: #fff; font-weight: 700; border-radius: 4px; padding: 2px 6px; font-size: 0.78rem; }
-.score .name small { display: block; font-weight: 400; opacity: 0.85; }
-.nums { display: flex; justify-content: space-around; margin: 4px 0; text-align: center; }
-.nums b { display: block; font-size: 1.3rem; color: var(--team); }
-.nums small, .score > small { color: #555; }
-.deck { height: 8px; background: #ddd; border-radius: 4px; overflow: hidden; }
+.score .name { display: flex; align-items: center; justify-content: space-between; gap: 6px; background: var(--team); color: #fff; font-weight: 700; border-radius: 4px; padding: 2px 6px; font-size: 0.78rem; margin-bottom: 4px; }
+.score .name small { display: block; font-weight: 400; opacity: 0.85; font-size: 0.65rem; }
+.score .name b { font-size: 1.5rem; line-height: 1; background: #fff; color: var(--team); border-radius: 4px; padding: 2px 8px; }
+.deck { height: 5px; background: #ddd; border-radius: 3px; overflow: hidden; }
 .bar { height: 100%; background: var(--team); }
 
-#cycle { background: #fff; border-radius: 8px; padding: 6px; }
+#cycle { background: #fff; border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 5px; }
 #cycleRow { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
 .chip { text-align: center; font-size: 0.65rem; background: #eee; border-radius: 4px; padding: 2px 0; color: #666; }
 .chip b { display: block; font-size: 0.8rem; }
 .chip span { display: block; min-height: 1em; }
 .chip.now { background: #ffc83d; color: #222; outline: 2px solid #b8860b; }
-#cycleText { margin: 6px 0 0; font: 0.72rem/1.3 system-ui, sans-serif; white-space: pre-wrap; color: #444; }
+#countRow { display: grid; gap: 2px; }
+.count { text-align: center; font-size: 0.75rem; background: #eee; border-radius: 4px; padding: 3px 0; color: #666; border: 2px solid transparent; }
+.count.done { background: #8c8577; color: #fff; }
+.count.now { outline: 2px solid #222; background: #fff3c4; color: #222; }
+.count.key { border-color: #d4a017; background: #ffe08a; color: #222; }
+.count.key.done { background: #d4a017; color: #fff; }
+.count.end { border-color: #111; background: #bbb; color: #111; }
+.count.end.done { background: #111; color: #fff; }
 
 #handTitle { color: #fff; font-weight: 700; padding: 4px 8px; border-radius: 6px 6px 0 0; font-size: 0.85rem; background: #555; margin-bottom: -8px; }
 #hand { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fff; padding: 8px; border-radius: 0 0 8px 8px; min-height: 90px; max-height: 22vh; overflow-y: auto; }
@@ -46,7 +51,17 @@ header { display: flex; gap: 6px; padding: 6px; padding-top: calc(6px + env(safe
 #endBtn.ready { animation: pulse 1s infinite; }
 @keyframes pulse { 50% { box-shadow: 0 0 0 5px rgba(255, 200, 61, 0.6); } }
 
-#overlay { position: fixed; inset: 0; background: rgba(20, 16, 12, 0.8); display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 10; }
+#overlay { position: fixed; inset: 0; background: rgba(20, 16, 12, 0.8); display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 20; }
+#title { position: fixed; inset: 0; z-index: 10; background: #120a18; display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+#titleStage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+#titleCanvas { display: block; }
+#titleHint { display: none; text-align: center; color: #f4ecd8; font-size: 0.9rem; padding: 4px 8px; }
+#titleButtons { display: flex; justify-content: center; gap: 16px; padding: 10px 12px 14px; }
+#titleButtons button { font-weight: 700; font-size: clamp(0.95rem, 3.2vmin, 1.4rem); padding: 0.45em 1.2em; min-width: 9em; border: 4px outset #ddd; border-radius: 4px; color: #1a1a1a; }
+#titleStart { background: #ffc83d; }
+#titleRules { background: #8fd0ff; }
+@media (orientation: portrait) { #titleHint { display: block; } }
+@media (orientation: landscape) and (max-height: 520px) { #titleButtons { padding: 4px 12px 6px; } }
 .panel { background: #fff; border-radius: 12px; padding: 16px; width: 100%; max-width: 460px; max-height: 100%; overflow-y: auto; }
 .panel h1 { margin: 0; text-align: center; font-size: 2.2rem; }
 .panel h2 { margin: 0 0 8px; }
@@ -67,6 +82,17 @@ header { display: flex; gap: 6px; padding: 6px; padding-top: calc(6px + env(safe
 .rules ul { padding-left: 18px; margin: 4px 0; }
 .rules li { margin-bottom: 4px; }
 #rulesBack { width: 100%; margin-top: 10px; }
+#rulesPanel { max-width: 640px; background: #fbf7ea; }
+#rulesPanel h2 { text-align: center; font-family: Georgia, serif; color: #7a2a14; font-size: 1.5rem; margin: 0; }
+#tutStep { text-align: center; color: #777; font-size: 0.8rem; margin-bottom: 6px; }
+#tutDiagram { overflow-x: auto; text-align: center; margin: 6px 0; }
+#tutDiagram canvas { display: inline-block; max-width: none; }
+#tutBody p { margin: 0 0 10px; }
+.tutnav { margin-top: 8px; }
+.tutnav button:disabled { opacity: 0.4; }
+#tutDots { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 10px; }
+#rulesPanel .dot { flex: none; width: 22px; height: 22px; padding: 0; border-radius: 50%; background: #d9d2bd; border: 0; }
+#rulesPanel .dot.on { background: #7a2a14; }
 
 #overBody h2 { color: #fff; text-align: center; padding: 8px; border-radius: 8px; font-size: 1.6rem; }
 #overBody .result { text-align: center; font-size: 1.3rem; font-weight: 700; margin: 8px 0; }
@@ -83,7 +109,7 @@ header { display: flex; gap: 6px; padding: 6px; padding-top: calc(6px + env(safe
   #app { max-width: none; display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr auto; }
   header { grid-column: 1 / 3; padding-top: 4px; padding-bottom: 4px; }
   #boardCol { grid-column: 1; grid-row: 2 / 4; height: 100%; min-height: 0; }
-  #boardWrap { width: calc(100vh - 56px - 3.2em); height: calc(100vh - 56px - 3.2em); max-height: none; aspect-ratio: auto; }
+  #boardWrap { width: calc(100vh - 56px - 52px); height: calc(100vh - 56px - 52px); max-height: none; aspect-ratio: auto; }
   #panel { grid-column: 2; grid-row: 2; min-height: 0; }
   #dock { grid-column: 2; grid-row: 3; }
 }
