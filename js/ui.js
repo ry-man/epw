@@ -651,7 +651,7 @@ function renderCycle() {
     row.innerHTML = "";
     for (let i = 1; i <= 10; i++) {
       const chip = document.createElement("div");
-      chip.className = "chip";
+      chip.className = "chip " + (EVENT_SHORT[i] ? EVENT_SHORT[i].toLowerCase() : "");
       chip.innerHTML = `<b>${i}</b><span>${EVENT_SHORT[i] || ""}</span>`;
       row.appendChild(chip);
     }
@@ -845,6 +845,17 @@ function setupControls() {
     if (game) render();
   });
   window.addEventListener("resize", () => { layout(); handKey = ""; if (game) render(); });
+  if (window.ResizeObserver) {
+    let lastW = 0;
+    let lastH = 0;
+    new ResizeObserver(() => {
+      const wrap = $("boardWrap");
+      if (wrap.clientWidth === lastW && wrap.clientHeight === lastH) return;
+      lastW = wrap.clientWidth;
+      lastH = wrap.clientHeight;
+      if (lastW > 0 && lastH > 0) layout();
+    }).observe($("boardWrap"));
+  }
   window.addEventListener("keydown", (e) => {
     if (!game) return;
     if (e.key === "r" || e.key === "R") game.rotateTile();
@@ -857,6 +868,7 @@ window.addEventListener("load", () => {
   setupControls();
   setupTutorial();
   layout();
+  requestAnimationFrame(drawFrame);
   showOverlay(null);
   $("title").hidden = false;
   renderTitle();

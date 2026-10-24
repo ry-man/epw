@@ -25,15 +25,21 @@ header { display: flex; gap: 6px; padding: 6px; padding-top: calc(6px + env(safe
 .bar { height: 100%; background: var(--team); }
 
 #cycle { background: #fff; border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 5px; }
-#cycleRow { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
+.cycline { display: flex; align-items: center; gap: 6px; }
+.cyclabel { flex: 0 0 38px; font-size: 0.6rem; line-height: 1.1; color: #555; font-weight: 600; }
+#cycleRow { flex: 1; min-width: 0; padding: 2px; display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
+.chip.ff { background: #d9412b; color: #fff; }
+.chip.ii { background: #2f7fd1; color: #fff; }
+.chip.both { background: #8e44ad; color: #fff; }
+.chip.prod { background: #2e9b57; color: #fff; }
 .chip { text-align: center; font-size: 0.65rem; background: #eee; border-radius: 4px; padding: 2px 0; color: #666; }
 .chip b { display: block; font-size: 0.8rem; }
 .chip span { display: block; min-height: 1em; }
-.chip.now { background: #ffc83d; color: #222; outline: 2px solid #b8860b; }
-#countRow { display: grid; gap: 2px; }
+.chip.now { outline: 3px solid #000; position: relative; z-index: 1; }
+#countRow { flex: 1; min-width: 0; padding: 2px; display: grid; gap: 3px; }
 .count { text-align: center; font-size: 0.75rem; background: #eee; border-radius: 4px; padding: 3px 0; color: #666; border: 2px solid transparent; }
 .count.done { background: #8c8577; color: #fff; }
-.count.now { outline: 2px solid #222; background: #fff3c4; color: #222; }
+.count.now { outline: 3px solid #000; position: relative; z-index: 1; }
 .count.key { border-color: #d4a017; background: #ffe08a; color: #222; }
 .count.key.done { background: #d4a017; color: #fff; }
 .count.end { border-color: #111; background: #bbb; color: #111; }
