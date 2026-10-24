@@ -582,7 +582,8 @@ const TUTORIAL_PAGES = [
     + "move; it is removed and immediately replaced from the deck, so you can continue your turn.",
   ]],
   ["The Event Cycle", [650, 310, 60], dCycle, [
-    "The dial advances one space after both players complete a turn. The panel beside the board shows "
+    "The dial advances one space after both players complete a turn, and that space's event happens "
+    + "only after both players have moved. The panel beside the board shows "
     + "how many full cycles have been played and which cycle triggers what.",
     "If both players place a citizen, whoever has more living citizens goes first; on a tie, the player "
     + "whose turn just ended goes first. Space 10 is the production event.",
@@ -595,7 +596,7 @@ const TUTORIAL_PAGES = [
   ]],
   ["New Factories", [480, 270, 44], dFactories, [
     "When the early game ends (after 2 cycles), and every 2 cycles after, both players place a new "
-    + "factory anywhere on the board.",
+    + "factory anywhere on the board, right after that cycle's production.",
     "It must be an empty space and cannot connect directly to a pipe carrying the opponent's element. "
     + "The player with more living citizens places first; on a tie, the player whose turn just ended goes "
     + "first. If a player has no legal space, that placement is skipped. New factories work and provide "

@@ -909,31 +909,36 @@ class Game {
     if (this.turnsInPair === 2) {
       this.turnsInPair = 0;
       this.eventSteps += 1;
-      this.eventPosition = (this.eventPosition % 10) + 1;
       this.runEvent();
       return;
     }
     this.beginTurn();
   }
 
+  // Runs after both players have moved; the event for the slot just completed.
   runEvent() {
-    if (this.eventSteps >= this.totalCycles * EVENT_CYCLE_LENGTH) {
-      this.finishGame();
-      return;
-    }
     const event = this.eventPosition;
-    const sinceOpen = this.eventSteps - FULL_BOARD_CYCLES * EVENT_CYCLE_LENGTH;
-    if (sinceOpen >= 0 && sinceOpen % (FACTORY_CYCLE_INTERVAL * EVENT_CYCLE_LENGTH) === 0) {
-      this.scheduleFactories();
-      return;
-    }
+    this.eventPosition = (event % 10) + 1;
     if (event === 4) this.scheduleCitizens([0, 1]);
     else if (event === 6 || event === 8) this.scheduleCitizens([0]);
     else if (event === 7 || event === 9) this.scheduleCitizens([1]);
     else if (event === 10) {
       this.produce();
-      this.beginTurn();
+      this.afterProduction();
     } else this.beginTurn();
+  }
+
+  afterProduction() {
+    if (this.eventSteps >= this.totalCycles * EVENT_CYCLE_LENGTH) {
+      this.finishGame();
+      return;
+    }
+    const sinceOpen = this.eventSteps - FULL_BOARD_CYCLES * EVENT_CYCLE_LENGTH;
+    if (sinceOpen >= 0 && sinceOpen % (FACTORY_CYCLE_INTERVAL * EVENT_CYCLE_LENGTH) === 0) {
+      this.scheduleFactories();
+      return;
+    }
+    this.beginTurn();
   }
 
   produce() {
