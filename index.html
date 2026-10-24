@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#2b2622">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>E.P.W. - Elemental Plumbing Wars</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+    <header>
+      <div id="turn">E.P.W.</div>
+      <button id="zoomBtn" class="hbtn" aria-label="Zoom board">&#128269; Auto</button>
+      <button id="menuBtn" class="hbtn" aria-label="Menu">&#9776;</button>
+    </header>
+
+    <section id="boardCol">
+      <div id="boardWrap"><canvas id="board"></canvas></div>
+      <div id="message" aria-live="polite"></div>
+    </section>
+
+    <section id="panel">
+      <div id="scoreboard">
+        <div class="score" id="score0" style="--team:#e0452a;--tint:#fdeee9">
+          <div class="name">Fire Folk (FF) <small id="who0"></small></div>
+          <div class="nums">
+            <div><b id="alive0">0</b><small>Alive</small></div>
+            <div><b id="lost0">0</b><small>Lost</small></div>
+            <div><b id="points0">0</b><small>Score</small></div>
+          </div>
+          <div class="deck"><div class="bar" id="bar0"></div></div>
+          <small>Tiles left: <span id="tiles0"></span></small>
+        </div>
+        <div class="score" id="score1" style="--team:#2f8fd8;--tint:#e8f3fc">
+          <div class="name">Ice Inhabitants (II) <small id="who1"></small></div>
+          <div class="nums">
+            <div><b id="alive1">0</b><small>Alive</small></div>
+            <div><b id="lost1">0</b><small>Lost</small></div>
+            <div><b id="points1">0</b><small>Score</small></div>
+          </div>
+          <div class="deck"><div class="bar" id="bar1"></div></div>
+          <small>Tiles left: <span id="tiles1"></span></small>
+        </div>
+      </div>
+
+      <div id="cycle">
+        <div id="cycleRow"></div>
+        <pre id="cycleText"></pre>
+      </div>
+    </section>
+
+    <section id="dock">
+      <div id="handTitle"></div>
+      <div id="hand"></div>
+      <div id="controls">
+        <button id="rotateBtn">&#10227; Rotate</button>
+        <button id="discardBtn">Discard</button>
+        <button id="endBtn">End turn</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="overlay" hidden>
+    <div class="panel" id="setupPanel" hidden>
+      <h1>E.P.W.</h1>
+      <p class="sub">Elemental Plumbing Wars</p>
+      <h3>Game length</h3>
+      <div id="lengths" class="segs"></div>
+      <h3>Fire Folk (FF)</h3>
+      <select id="p0mode"></select>
+      <h3>Ice Inhabitants (II)</h3>
+      <select id="p1mode"></select>
+      <h3>CPU speed</h3>
+      <select id="speed">
+        <option value="1">Normal</option>
+        <option value="2">Fast</option>
+        <option value="4">Very fast</option>
+      </select>
+      <div class="row">
+        <button id="startBtn" class="primary">Start game</button>
+        <button id="rulesBtn">How to play</button>
+      </div>
+    </div>
+
+    <div class="panel" id="menuPanel" hidden>
+      <h2>Menu</h2>
+      <h3>CPU speed</h3>
+      <select id="menuSpeed">
+        <option value="1">Normal</option>
+        <option value="2">Fast</option>
+        <option value="4">Very fast</option>
+      </select>
+      <div class="col">
+        <button id="menuRules">How to play</button>
+        <button id="menuNew">New game</button>
+        <button id="menuClose" class="primary">Resume</button>
+      </div>
+    </div>
+
+    <div class="panel" id="rulesPanel" hidden>
+      <h2>How to play</h2>
+      <div class="rules">
+        <p>Redirect fire (Fire Folk) or water (Ice Inhabitants) through pipes to destroy the enemy's citizens. Most citizens destroyed wins.</p>
+        <h4>Your turn</h4>
+        <ul>
+          <li>Tap a tile in your hand. Pipes: tap a board space to preview, <b>Rotate</b> as needed, then tap the same space again to confirm. Green dots show legal spaces.</li>
+          <li>A pipe must touch an existing pipe or factory; touching sides must both be open or both closed. A pipe may never carry both fire and water.</li>
+          <li><b>Bomb</b> destroys any pipe. <b>Construction</b> replaces a pipe permanently (not one fed directly by a factory).</li>
+          <li><b>Move 1/2/3</b>: tap your citizen, then a clear destination within that many steps.</li>
+          <li><b>Doubleplay</b>: tap it twice. You must then play all your other tiles (plus extras drawn).</li>
+          <li>A tile with no legal move can be <b>Discarded</b> (it's replaced, no turn used).</li>
+          <li>Tap <b>End turn</b> when done.</li>
+        </ul>
+        <h4>Event cycle</h4>
+        <p>After both players move, the counter advances. Space 4: both place a citizen. 6/8: Fire places. 7/9: Ice places. 10: factories produce &mdash; every citizen next to the open end of an enemy pipe is destroyed, along with any same-team citizens touching them (chain).</p>
+        <p>Citizens go within 2 steps of your factories or star (spawn) pipe tiles. For the first 2 cycles everything stays inside the centre 8&times;8 grid; then the board opens and each side places a new factory, repeating every 2 cycles.</p>
+        <p>Tip: use the &#128269; button to zoom the board and drag to pan.</p>
+      </div>
+      <button id="rulesBack" class="primary" data-back="setupPanel">Back</button>
+    </div>
+
+    <div class="panel" id="overPanel" hidden>
+      <div id="overBody"></div>
+      <div class="row">
+        <button id="overNew" class="primary">New game</button>
+        <button id="overClose">View board</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/game.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>

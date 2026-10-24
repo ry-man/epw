@@ -1,0 +1,89 @@
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: #2b2622; color: #222; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overscroll-behavior: none; }
+button, select { font: inherit; }
+[hidden] { display: none !important; }
+
+#app { display: flex; flex-direction: column; height: 100%; max-width: 760px; margin: 0 auto; background: #f1eee6; padding-bottom: env(safe-area-inset-bottom); }
+header { display: flex; gap: 6px; padding: 6px; padding-top: calc(6px + env(safe-area-inset-top)); background: #2b2622; }
+#turn { flex: 1; color: #fff; font-weight: 700; padding: 8px 10px; border-radius: 6px; background: #555; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbtn { background: #4a433c; color: #fff; border: 0; border-radius: 6px; padding: 0 12px; }
+
+#boardCol { display: flex; flex-direction: column; flex: 0 0 auto; }
+#boardWrap { width: 100%; aspect-ratio: 1 / 1; max-height: 52vh; align-self: center; overflow: auto; background: #d9d4c6; touch-action: pan-x pan-y; }
+#board { display: block; margin: 0 auto; }
+#message { min-height: 3.2em; padding: 6px 10px; font-size: 0.85rem; line-height: 1.25; background: #fff8e1; border-bottom: 1px solid #ddd; }
+
+#panel { flex: 1; min-height: 0; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 8px; }
+#dock { flex: 0 0 auto; padding: 8px; background: #e6e1d4; border-top: 1px solid #c9c2b0; display: flex; flex-direction: column; gap: 8px; }
+#scoreboard { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.score { background: var(--tint); border: 2px solid var(--team); border-radius: 8px; padding: 6px; font-size: 0.8rem; }
+.score.active { box-shadow: 0 0 0 3px var(--team); }
+.score .name { background: var(--team); color: #fff; font-weight: 700; border-radius: 4px; padding: 2px 6px; font-size: 0.78rem; }
+.score .name small { display: block; font-weight: 400; opacity: 0.85; }
+.nums { display: flex; justify-content: space-around; margin: 4px 0; text-align: center; }
+.nums b { display: block; font-size: 1.3rem; color: var(--team); }
+.nums small, .score > small { color: #555; }
+.deck { height: 8px; background: #ddd; border-radius: 4px; overflow: hidden; }
+.bar { height: 100%; background: var(--team); }
+
+#cycle { background: #fff; border-radius: 8px; padding: 6px; }
+#cycleRow { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
+.chip { text-align: center; font-size: 0.65rem; background: #eee; border-radius: 4px; padding: 2px 0; color: #666; }
+.chip b { display: block; font-size: 0.8rem; }
+.chip span { display: block; min-height: 1em; }
+.chip.now { background: #ffc83d; color: #222; outline: 2px solid #b8860b; }
+#cycleText { margin: 6px 0 0; font: 0.72rem/1.3 system-ui, sans-serif; white-space: pre-wrap; color: #444; }
+
+#handTitle { color: #fff; font-weight: 700; padding: 4px 8px; border-radius: 6px 6px 0 0; font-size: 0.85rem; background: #555; margin-bottom: -8px; }
+#hand { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fff; padding: 8px; border-radius: 0 0 8px 8px; min-height: 90px; max-height: 22vh; overflow-y: auto; }
+.card { width: 74px; height: 74px; border: 3px solid #555; border-radius: 8px; background: #f7f5ef; touch-action: manipulation; }
+.card.selected { border-color: #2e8b57; box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.45); transform: translateY(-4px); }
+
+#controls { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 8px; }
+#controls button { padding: 12px 6px; border: 0; border-radius: 8px; background: #6b6257; color: #fff; font-weight: 700; }
+#controls button:disabled { opacity: 0.35; }
+#endBtn { background: #c47f00 !important; }
+#endBtn.ready { animation: pulse 1s infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 5px rgba(255, 200, 61, 0.6); } }
+
+#overlay { position: fixed; inset: 0; background: rgba(20, 16, 12, 0.8); display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 10; }
+.panel { background: #fff; border-radius: 12px; padding: 16px; width: 100%; max-width: 460px; max-height: 100%; overflow-y: auto; }
+.panel h1 { margin: 0; text-align: center; font-size: 2.2rem; }
+.panel h2 { margin: 0 0 8px; }
+.panel h3 { margin: 12px 0 4px; font-size: 0.9rem; color: #555; }
+.sub { text-align: center; margin: 0 0 8px; color: #666; }
+.panel select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #bbb; background: #fff; }
+.segs { display: flex; gap: 6px; }
+.seg { flex: 1; }
+.seg input { display: none; }
+.seg span { display: block; text-align: center; padding: 10px 4px; border: 2px solid #bbb; border-radius: 8px; font-weight: 700; }
+.seg input:checked + span { background: #ffc83d; border-color: #b8860b; }
+.row { display: flex; gap: 8px; margin-top: 16px; }
+.col { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.panel button { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #aaa; background: #eee; font-weight: 700; }
+.panel button.primary { background: #ffc83d; border-color: #b8860b; }
+.rules { font-size: 0.88rem; line-height: 1.35; }
+.rules h4 { margin: 10px 0 2px; }
+.rules ul { padding-left: 18px; margin: 4px 0; }
+.rules li { margin-bottom: 4px; }
+#rulesBack { width: 100%; margin-top: 10px; }
+
+#overBody h2 { color: #fff; text-align: center; padding: 8px; border-radius: 8px; font-size: 1.6rem; }
+#overBody .result { text-align: center; font-size: 1.3rem; font-weight: 700; margin: 8px 0; }
+#overBody p { text-align: center; margin: 4px 0; font-size: 0.9rem; }
+.sumrow { display: flex; gap: 8px; }
+.sumcard { flex: 1; border: 1px solid; border-radius: 8px; padding: 8px; text-align: center; font-size: 0.78rem; }
+.sumcard.win { border-width: 3px; }
+.sumcard .big { font-size: 2.2rem; font-weight: 800; }
+.sumcard small { display: block; color: #555; }
+.sumcard small.left { text-align: left; margin-top: 6px; }
+
+/* Landscape phones: board on the left, controls on the right. */
+@media (orientation: landscape) and (max-height: 520px) {
+  #app { max-width: none; display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr auto; }
+  header { grid-column: 1 / 3; padding-top: 4px; padding-bottom: 4px; }
+  #boardCol { grid-column: 1; grid-row: 2 / 4; height: 100%; min-height: 0; }
+  #boardWrap { width: calc(100vh - 56px - 3.2em); height: calc(100vh - 56px - 3.2em); max-height: none; aspect-ratio: auto; }
+  #panel { grid-column: 2; grid-row: 2; min-height: 0; }
+  #dock { grid-column: 2; grid-row: 3; }
+}
