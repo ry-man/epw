@@ -747,8 +747,7 @@ class Game {
         for (const side of SIDES) {
           const next = neighbor(position, side);
           const [x, y] = xy(next);
-          if (inBounds(x, y) && !seen.has(next) && !this.board.has(next)
-            && !this.factories.has(next) && !this.blocks.has(next)) {
+          if (inBounds(x, y) && !seen.has(next)) {
             seen.add(next);
             queue.push([next, steps + 1]);
             cells.add(next);
@@ -796,7 +795,7 @@ class Game {
     }
     const owner = this.pendingPlacements[this.placementIndex];
     if (!this.validCitizenCells(owner).has(position)) {
-      this.setMessage(`Citizens must be placed within ${SPAWN_RANGE} steps of one of your factories or spawning tiles (highlighted), inside the starting grid until it opens.`);
+      this.setMessage(`Citizens must be placed within ${SPAWN_RANGE} cardinal steps of one of your factories or spawning tiles (highlighted). Intervening pipes, citizens, and construction sites do not block distance; the destination must be blank and inside the starting grid until it opens.`);
       return;
     }
     const citizen = { owner, position };

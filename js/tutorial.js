@@ -324,19 +324,19 @@ function dCrossing(p) {
 function dSpawn(p) {
   p.grid(9, 7);
   const sources = [[4, 3], [1, 5]];
-  const blocked = new Set(["5,3", "1,5", "4,3"]);
+  const occupied = new Set(["5,3", "1,5", "4,3"]);
   const citizens = new Set(["3,2", "4,5"]);
   const srcKeys = new Set(sources.map((s) => s.join(",")));
-  for (const [x, y] of reachable(sources, blocked, 9, 7, 2)) {
+  for (const [x, y] of reachable(sources, new Set(), 9, 7, 2)) {
     const key = `${x},${y}`;
-    if (!srcKeys.has(key) && !citizens.has(key)) p.tint(x, y, "#f6c9bd");
+    if (!occupied.has(key) && !srcKeys.has(key) && !citizens.has(key)) p.tint(x, y, "#f6c9bd");
   }
   p.factory(4, 3, "Fire");
   p.pipe(5, 3, "Straight", "LR", "Fire");
   p.pipe(1, 5, "Straight", "LR", null, 0);
   p.citizen(3, 2, 0);
   p.citizen(4, 5, 0);
-  p.text(7.2, 3.0, "Pipes block\nspawning", 9, "#555555");
+  p.text(7.2, 3.0, "Pipes don't block\nplacement range", 9, "#555555");
   p.text(6.8, 0.6, "Shaded = where a Fire citizen\nmay appear (2 steps)", 9, "#b02a14");
   p.text(4.5, 7.25, "Star pipe = spawn point", 9, "#b02a14");
 }
@@ -554,10 +554,10 @@ const TUTORIAL_PAGES = [
     + "a different element. Double turns work like Cross, with bent pipes.",
   ]],
   ["Citizens and Spawning", [432, 360, 48], dSpawn, [
-    "At citizen events, place each new citizen within 2 steps of one of your factories or star pipes. "
-    + "Count up/down/left/right steps; pipes, factories, and construction sites block the route.",
-    "The destination must be empty. An existing citizen cannot be the destination, but it does not "
-    + "block the two-step route. During the early game, the destination must also be inside the starting grid.",
+    "At citizen events, place each new citizen within 2 cardinal steps of one of your factories or "
+    + "star pipes. Count up/down/left/right; intervening pipes, citizens, and construction sites do not "
+    + "block the distance.",
+    "The destination must be blank. During the early game, it must also be inside the starting grid.",
     "If there is no open space, that citizen is destroyed immediately and counts for your opponent!",
     "If a star pipe is destroyed or replaced, it no longer provides a spawn point.",
   ]],
