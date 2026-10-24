@@ -282,14 +282,30 @@ function drawCitizen(ctx, owner, cx, cy, radius, mood, alpha = 1, scale = 1) {
   ctx.lineWidth = Math.max(1.5, r * 0.18);
   ctx.strokeStyle = "#fff";
   ctx.stroke();
-  // Flame tuft for Fire Folk, ice crown for Ice Inhabitants.
-  ctx.fillStyle = owner === 0 ? "#ffb347" : "#e6f6ff";
+  // Cowboy hat: dented crown, team-colored band, wide brim.
+  const line = Math.max(1, r * 0.1);
+  ctx.lineWidth = line;
+  const hatBand = owner === 0 ? "#c0392b" : "#2f7fd6";
+  ctx.strokeStyle = hatBand;
+  ctx.fillStyle = owner === 0 ? "#ff9aa8" : "#8fd0ff";
   ctx.beginPath();
-  ctx.moveTo(cx - r * 0.45, cy - r * 0.75);
-  ctx.lineTo(cx, cy - r * 1.45);
-  ctx.lineTo(cx + r * 0.45, cy - r * 0.75);
+  ctx.moveTo(cx - r * 0.5, cy - r * 0.68);
+  ctx.lineTo(cx - r * 0.45, cy - r * 1.15);
+  ctx.lineTo(cx - r * 0.15, cy - r * 1.2);
+  ctx.lineTo(cx, cy - r * 1.02);
+  ctx.lineTo(cx + r * 0.15, cy - r * 1.2);
+  ctx.lineTo(cx + r * 0.45, cy - r * 1.15);
+  ctx.lineTo(cx + r * 0.5, cy - r * 0.68);
   ctx.closePath();
   ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = hatBand;
+  ctx.fillRect(cx - r * 0.49, cy - r * 0.88, r * 0.98, r * 0.2);
+  ctx.fillStyle = owner === 0 ? "#ffb3bd" : "#b3e0ff";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - r * 0.65, r * 1.3, r * 0.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
   if (mood === "dead") {
     ctx.strokeStyle = "#222";
     ctx.lineWidth = Math.max(1, r * 0.1);
@@ -748,7 +764,7 @@ function showGameOver() {
   const g = game;
   const living = [0, 1].map((o) => g.citizens.filter((c) => c.owner === o).length);
   const banner = g.winner === null ? "#444" : TEAM_COLORS[g.winner];
-  const result = g.winner === null ? "The game is a draw." : `${PLAYERS[g.winner]} win!`;
+  const result = g.result;
   const card = (o) => {
     const product = FACTORIES_BY_OWNER[o];
     const counts = Object.entries(g.tilePlayCounts[o]).map(([n, c]) => `${n}: ${c}`).join("<br>");
@@ -757,6 +773,7 @@ function showGameOver() {
       <div class="big" style="color:${TEAM_COLORS[o]}">${g.scores[o]}</div>
       <small>citizens destroyed</small>
       <small>Lost: ${g.destroyed[o]} &nbsp; Alive: ${living[o]}</small>
+      <small><b style="color:${TEAM_COLORS[o]}">Decimal Alive Score: ${g.decimalScores[o].toFixed(2)}</b></small>
       <small class="left">Tiles played:<br>${counts}<br><br>${product} pipes at end: ${g.finalPipeProductCounts[product]}<br>Most ${product} pipes: ${g.highestPipeProductCounts[product]}</small>
     </div>`;
   };

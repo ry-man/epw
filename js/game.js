@@ -2,9 +2,10 @@
 
 // Game engine: a direct port of fire_n_ice.py (rules + CPU players), no DOM access.
 
-const BOARD_SIZE = 20;
-const START_SIZE = 8;
-const START_OFFSET = (BOARD_SIZE - START_SIZE) >> 1;
+const BOARD_SIZES = { 8: 15, 10: 17, 12: 19 };
+let BOARD_SIZE = 17;
+const START_SIZE = 9;
+let START_OFFSET = (BOARD_SIZE - START_SIZE) >> 1;
 const FACTORY_INSET = 2;
 const SPAWN_FRACTION = 0.10;
 const SPAWN_RANGE = 2;
@@ -44,7 +45,7 @@ const DIFFICULTIES = {
 };
 const HAND_SIZE = 3;
 
-const START_FACTORIES = [
+const startFactories = () => [
   [`${START_OFFSET + FACTORY_INSET},${START_OFFSET + FACTORY_INSET}`, "Fire"],
   [
     `${START_OFFSET + START_SIZE - 1 - FACTORY_INSET},${START_OFFSET + START_SIZE - 1 - FACTORY_INSET}`,
@@ -117,6 +118,8 @@ function maxBy(list, fn) {
 class Game {
   constructor({ totalCycles = 10, cpu = [false, false], difficulty = ["Normal", "Normal"] } = {}) {
     this.totalCycles = totalCycles;
+    BOARD_SIZE = BOARD_SIZES[totalCycles] || 17;
+    START_OFFSET = (BOARD_SIZE - START_SIZE) >> 1;
     this.cpu = cpu;
     this.difficulty = difficulty;
     this.onChange = null;
@@ -126,6 +129,8 @@ class Game {
     this.board = new Map();
     this.citizens = [];
     this.destroyed = [0, 0];
+    this.lifeRecords = [];
+    this.decimalScores = [0, 0];
     const tileNames = [...Object.keys(PIPE_COUNTS), "Bomb", "Construction", "Move 1", "Move 2", "Move 3", "Doubleplay"];
     this.tilePlayCounts = PLAYERS.map(() => Object.fromEntries(tileNames.map((n) => [n, 0])));
     this.citizensDestroyedThisTurn = 0;
@@ -151,7 +156,7 @@ class Game {
     this.pendingPlacements = [];
     this.placementKind = "citizen";
     this.placementIndex = 0;
-    this.factories = new Map(START_FACTORIES);
+    this.factories = new Map(startFactories());
     this.blocks = new Set();
     this.movingCitizen = null;
     this.gameOver = false;
@@ -798,7 +803,7 @@ class Game {
       this.setMessage(`Citizens must be placed within ${SPAWN_RANGE} cardinal steps of one of your factories or spawning tiles (highlighted). Intervening pipes, citizens, and construction sites do not block distance; the destination must be blank and inside the starting grid until it opens.`);
       return;
     }
-    const citizen = { owner, position };
+    const citizen = { owner, position, born: this.eventSteps };
     this.citizens.push(citizen);
     this.addEffect("place", { citizen });
     this.mark(position, null, owner);
@@ -964,6 +969,7 @@ class Game {
       const citizen = this.citizens[index];
       this.addEffect("kill", { position: citizen.position, owner: citizen.owner });
       this.destroyed[citizen.owner] += 1;
+      this.lifeRecords.push([citizen.owner, citizen.born, this.eventSteps]);
       this.citizens.splice(index, 1);
     }
     this.citizensDestroyedThisTurn += indexes.length;
@@ -981,11 +987,29 @@ class Game {
       );
     }
     this.gameOver = true;
+    this.decimalScores = this.computeDecimalScores();
     this.scores = [this.destroyed[1], this.destroyed[0]];
-    this.winner = this.scores[0] > this.scores[1] ? 0 : this.scores[1] > this.scores[0] ? 1 : null;
-    const result = this.winner === null ? "The game is a draw." : `${PLAYERS[this.winner]} win!`;
+    const [d0, d1] = this.decimalScores;
+    if (this.scores[0] !== this.scores[1]) this.winner = this.scores[0] > this.scores[1] ? 0 : 1;
+    else if (Math.abs(d0 - d1) > 1e-9) this.winner = d0 > d1 ? 0 : 1;
+    else this.winner = null;
+    let result = this.winner === null ? "The game is a draw." : `${PLAYERS[this.winner]} win!`;
+    if (this.winner !== null && this.scores[0] === this.scores[1]) result += " (Decimal Alive Score tie-breaker)";
+    this.result = result;
     this.setMessage(`Game over. ${result}`);
     this.refresh();
+  }
+
+  // Each placed citizen is worth the fraction of its potential life it completed.
+  computeDecimalScores() {
+    const end = this.eventSteps;
+    const totals = [0, 0];
+    for (const [owner, born, died] of this.lifeRecords) {
+      const potential = end - born;
+      totals[owner] += potential > 0 ? Math.min(1, (died - born) / potential) : 0;
+    }
+    for (const citizen of this.citizens) totals[citizen.owner] += 1;
+    return totals;
   }
 
   cycleMilestoneText() {

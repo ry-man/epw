@@ -170,16 +170,6 @@ class TitleArt {
     const rim = owner === 0 ? "#8a2a12" : "#1d5f94";
     const cy = feetY - 12 - r;
     for (const sx of [-0.45, 0.45]) this.oval(x + sx * r - 14, feetY - 14, x + sx * r + 14, feetY + 4, "#2b2b2b");
-    if (owner === 0) {
-      for (const [dx, size] of [[-0.5, 0.45], [0, 0.65], [0.5, 0.45]]) {
-        this.flame(x + dx * r, cy - r * 0.95, r * size, "#ff9b2f", "#ffe45c");
-      }
-    } else {
-      for (const [dx, size] of [[-0.55, 0.5], [0, 0.8], [0.55, 0.5]]) {
-        this.poly([x + dx * r - 9, cy - r * 0.85, x + dx * r + 9, cy - r * 0.85, x + dx * r, cy - r * (0.85 + size)],
-          "#e6f7ff", "#3b84b8", 2);
-      }
-    }
     this.line([x + facing * r * 0.9, cy + r * 0.2, x + facing * r * 1.45, cy - r * 0.25], rim, 8, true);
     this.oval(x + facing * r * 1.45 - 11, cy - r * 0.25 - 11, x + facing * r * 1.45 + 11, cy - r * 0.25 + 11, body, rim, 3);
     this.line([x - facing * r * 0.9, cy + r * 0.3, x - facing * r * 1.25, cy + r * 0.75], rim, 8, true);
@@ -204,6 +194,14 @@ class TitleArt {
     }
     const vx = x - facing * r * 0.6, vy = cy - r * 0.62;
     for (const [dx, dy] of [[-6, -6], [6, 6], [-6, 6], [6, -6]]) this.line([vx, vy, vx + dx, vy + dy], "#c0141c", 3);
+    const hy = cy - r * 0.72;
+    const hatBand = owner === 0 ? "#c0392b" : "#2f7fd6";
+    const crown = owner === 0 ? "#ff9aa8" : "#8fd0ff";
+    const brim = owner === 0 ? "#ffb3bd" : "#b3e0ff";
+    this.poly([x - r * 0.5, hy, x - r * 0.45, cy - r * 1.2, x - r * 0.15, cy - r * 1.26, x, cy - r * 1.06,
+      x + r * 0.15, cy - r * 1.26, x + r * 0.45, cy - r * 1.2,       x + r * 0.5, hy], crown, hatBand, 3);
+          this.rect(x - r * 0.49, cy - r * 0.94, x + r * 0.49, hy, hatBand);
+          this.oval(x - r * 1.35, hy - r * 0.22, x + r * 1.35, hy + r * 0.22, brim, hatBand, 3);
   }
 }
 

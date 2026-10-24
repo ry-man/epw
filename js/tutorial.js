@@ -212,13 +212,13 @@ function dGoal(p) {
 
 function dBoard(p) {
   const shaded = [];
-  for (let x = 2; x < 10; x++) for (let y = 1; y < 9; y++) shaded.push([x, y]);
-  p.grid(12, 10, shaded);
+  for (let x = 2; x < 11; x++) for (let y = 1; y < 10; y++) shaded.push([x, y]);
+  p.grid(13, 11, shaded);
   p.factory(4, 3, "Fire");
-  p.factory(7, 6, "Water");
-  p.text(6, 4.5, "STARTING GRID", 12, "#7a6a30");
-  p.text(6, 5.1, "(early game: play stays inside)", 9, "#7a6a30", false);
-  p.text(6, 0.9, "The full board opens after 2 event cycles", 10, "#555555", false);
+  p.factory(8, 7, "Water");
+  p.text(6.5, 5.0, "STARTING GRID", 12, "#7a6a30");
+  p.text(6.5, 5.6, "(early game: play stays inside)", 9, "#7a6a30", false);
+  p.text(6.5, 0.5, "The full board opens after 2 event cycles", 10, "#555555", false);
 }
 
 function dHand(p) {
@@ -508,9 +508,10 @@ const TUTORIAL_PAGES = [
     "Every enemy citizen destroyed is a point for you. The game ends after the chosen number of cycles "
     + "or when both players run out of tiles; the higher score wins (a tie is a draw).",
   ]],
-  ["The Board", [408, 340, 34], dBoard, [
-    "The board is a 20x20 grid. Each team starts with one factory (fire for FF, water for II) inside the "
-    + "8x8 starting grid in the middle.",
+  ["The Board", [416, 352, 32], dBoard, [
+    "The board size depends on the game length you choose: 15x15 for 8 cycles, 17x17 for 10 cycles, or "
+    + "19x19 for 12 cycles. Each team starts with one factory (fire for FF, water for II) inside the "
+    + "9x9 starting grid in the middle.",
     "For the first 2 event cycles - the early game - everything must stay inside the starting grid. "
     + "After that the whole board opens up.",
   ]],
@@ -603,9 +604,13 @@ const TUTORIAL_PAGES = [
   ["Winning the Game", [520, 190, 40], dWinning, [
     "Before the game you choose how long it lasts: 8, 10 or 12 full event cycles. When the last cycle "
     + "ends, its production happens first; no further citizen or factory placement happens. The player "
-    + "who destroyed more enemy citizens wins; a tie is a draw. The game can also end early when both "
+    + "who destroyed more enemy citizens wins. If the scores are tied, the higher Decimal Alive Score wins (a "
+    + "draw only if that is tied too). The game can also end early when both "
     + "players' decks and hands are empty.",
-    "The final summary also records each player's tiles played, each team's final and peak number of "
+    "Decimal Alive Score: each citizen you placed that survives to the end is worth 1. A citizen that is "
+    + "destroyed is worth the fraction of its potential life it completed - turns survived divided by "
+    + "turns it would have survived if it lived to the end.",
+    "The final summary also records each player's Decimal Alive Score, tiles played, each team's final and peak number of "
     + "product-carrying pipes, and the most citizens destroyed in one turn.",
     "Tips: use bombs to cut off an enemy pipe, keep your citizens spread out and away from pipe ends, "
     + "and use Construction to lock a dangerous pipe down for good.",
