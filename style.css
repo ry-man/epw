@@ -62,10 +62,11 @@ header { display: flex; gap: 6px; padding: 6px; padding-top: calc(6px + env(safe
 #titleStage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
 #titleCanvas { display: block; }
 #titleHint { display: none; text-align: center; color: #f4ecd8; font-size: 0.9rem; padding: 4px 8px; }
-#titleButtons { display: flex; justify-content: center; gap: 16px; padding: 10px 12px 14px; }
-#titleButtons button { font-weight: 700; font-size: clamp(0.95rem, 3.2vmin, 1.4rem); padding: 0.45em 1.2em; min-width: 9em; border: 4px outset #ddd; border-radius: 4px; color: #1a1a1a; }
+#titleButtons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 10px 12px 14px; }
+#titleButtons button { font-weight: 700; font-size: clamp(0.95rem, 3.2vmin, 1.4rem); padding: 0.45em 1.2em; min-width: 8em; border: 4px outset #ddd; border-radius: 4px; color: #1a1a1a; }
 #titleStart { background: #ffc83d; }
 #titleRules { background: #8fd0ff; }
+#titleTutorial { background: #b6e8a8; }
 @media (orientation: portrait) { #titleHint { display: block; } }
 @media (orientation: landscape) and (max-height: 520px) { #titleButtons { padding: 4px 12px 6px; } }
 .panel { background: #fff; border-radius: 12px; padding: 16px; width: 100%; max-width: 460px; max-height: 100%; overflow-y: auto; }
@@ -80,6 +81,31 @@ header { display: flex; gap: 6px; padding: 6px; padding-top: calc(6px + env(safe
 .seg span { display: block; text-align: center; padding: 10px 4px; border: 2px solid #bbb; border-radius: 8px; font-weight: 700; }
 .seg input:checked + span { background: #ffc83d; border-color: #b8860b; }
 .row { display: flex; gap: 8px; margin-top: 16px; }
+.row + .row { margin-top: 8px; }
+.panel button.tutbtn { background: #b6e8a8; border-color: #5c9b4b; }
+
+/* Interactive tutorial */
+#coach { background: #fbf7ea; border: 2px solid #ffc83d; border-radius: 8px; padding: 6px 10px 8px; max-height: 38vh; overflow-y: auto; }
+.coachtop { display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: #777; }
+#coachExit { border: 0; background: #e6dcc0; border-radius: 6px; padding: 3px 8px; font-weight: 700; }
+#coach h3 { margin: 2px 0; font-family: Georgia, serif; color: #7a2a14; font-size: 1.05rem; }
+#coach p { margin: 2px 0 4px; font-size: 0.85rem; line-height: 1.3; white-space: pre-line; }
+#coachDone { color: #1e7a3a; font-weight: 700; }
+#coachAction { padding: 8px 14px; border: 0; border-radius: 8px; background: #ffc83d; font-weight: 700; margin-bottom: 4px; }
+.coachnav { display: flex; gap: 6px; margin-top: 4px; position: sticky; bottom: -8px; background: #fbf7ea; padding-bottom: 2px; }
+.coachnav button { flex: 1; padding: 8px 4px; border: 1px solid #aaa; border-radius: 8px; background: #eee; font-weight: 700; }
+.coachnav button.primary { background: #ffc83d; border-color: #b8860b; }
+.coachnav button:disabled { opacity: 0.4; }
+body.tutoring #menuBtn { display: none; }
+body.tutoring #panel { overflow-y: auto; min-height: 0; }
+body.tutoring #scoreboard:not(.spot), body.tutoring #cycle:not(.spot) { display: none; }
+body.tutoring #boardWrap { min-height: 190px; }
+body.tutoring #boardCol { flex: 1 0 auto; min-height: 250px; }
+body.tutoring #app { overflow-y: auto; }
+body.tutoring #message { display: none; }
+body.tutoring #coach { max-height: 42vh; }
+.spot { outline: 4px solid #ffc83d; outline-offset: -4px; animation: spotpulse 1s infinite; }
+@keyframes spotpulse { 50% { outline-color: rgba(255, 200, 61, 0.25); } }
 .col { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
 .panel button { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #aaa; background: #eee; font-weight: 700; }
 .panel button.primary { background: #ffc83d; border-color: #b8860b; }

@@ -1,5 +1,5 @@
 "use strict";
-// Illustrated "How to Play" guide. Mirrors the desktop tutorial: same pages, diagrams and text.
+// Illustrated "Game Rules" guide. Mirrors the desktop tutorial: same pages, diagrams and text.
 // Diagrams are drawn with the real game graphics (drawTile, drawFactory, ... from ui.js).
 
 const T_INK = "#2b2b2b";
@@ -622,7 +622,7 @@ const TUTORIAL_PAGES = [
     "Player settings: on the start screen, set either side (or both!) to Human or a CPU level.",
     "CPU speed: adjust how fast CPU turns go - choose Fast or Very fast to speed things up.",
     "Zoom: the \uD83D\uDD0D button zooms the board; drag to pan.",
-    "Open How to play from the start screen or the menu at any time to see this guide again.",
+    "Open Game Rules from the start screen or the menu at any time to see this guide again; choose Tutorial for an interactive walkthrough.",
   ]],
 ];
 

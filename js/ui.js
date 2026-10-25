@@ -354,7 +354,7 @@ function effectiveZoom() {
 
 function layout() {
   const wrap = $("boardWrap");
-  const base = Math.floor(Math.min(wrap.clientWidth, wrap.clientHeight) / BOARD_SIZE);
+  const base = Math.floor(Math.min(wrap.offsetWidth, wrap.offsetHeight) / BOARD_SIZE);
   appliedZoom = effectiveZoom();
   cell = Math.max(10, Math.floor(base * appliedZoom));
   const canvas = $("board");
@@ -367,6 +367,7 @@ function layout() {
   staticKey = "";
   wrap.scrollLeft = (css - wrap.clientWidth) / 2;
   wrap.scrollTop = (css - wrap.clientHeight) / 2;
+  if (game) paintBoard();
 }
 
 function updateDerived() {
@@ -474,9 +475,13 @@ function renderStatic() {
   }
 }
 
-function drawFrame(now) {
+function drawFrame() {
   requestAnimationFrame(drawFrame);
   if (!game || document.hidden) return;
+  paintBoard();
+}
+
+function paintBoard() {
   updateDerived();
   renderStatic();
   const canvas = $("board");
@@ -487,6 +492,7 @@ function drawFrame(now) {
   ctx.clearRect(0, 0, size, size);
   ctx.drawImage(staticLayer, 0, 0, size, size);
   const t = performance.now();
+  const now = t;
   game.effects = game.effects.filter((e) => t - e.t < 4000);
 
   // flowing product glow
@@ -586,6 +592,7 @@ function drawFrame(now) {
       ctx.globalAlpha = 1;
     }
   }
+  drawGuideHints(ctx, t);
 }
 
 // ---------------------------------------------------------------- panels ---
@@ -636,6 +643,7 @@ function renderHand() {
     canvas.className = `card${game.selected === i ? " selected" : ""}`;
     container.appendChild(canvas);
     requestAnimationFrame(() => {
+      if (!game) return;
       drawCard(canvas, tile.name, tile.spawn, !reveal);
       if (reveal && game.selected === i && tile.name in PIPE_CHANNELS) {
         // Show the current rotation on the selected card.
@@ -829,6 +837,8 @@ function setupSetupPanel() {
   $("startBtn").addEventListener("click", startGame);
   $("rulesBtn").addEventListener("click", () => { $("rulesBack").dataset.back = "setupPanel"; showOverlay("rulesPanel"); openTutorial(); });
   $("menuRules").addEventListener("click", () => { $("rulesBack").dataset.back = "menuPanel"; showOverlay("rulesPanel"); openTutorial(); });
+  $("setupTutorialBtn").addEventListener("click", () => startGuide("setupPanel"));
+  $("menuTutorial").addEventListener("click", () => startGuide("menuPanel"));
   $("rulesBack").addEventListener("click", () => {
     const back = $("rulesBack").dataset.back;
     if (back === "title") hideOverlay(); else showOverlay(back);
@@ -867,9 +877,9 @@ function setupControls() {
     let lastH = 0;
     new ResizeObserver(() => {
       const wrap = $("boardWrap");
-      if (wrap.clientWidth === lastW && wrap.clientHeight === lastH) return;
-      lastW = wrap.clientWidth;
-      lastH = wrap.clientHeight;
+      if (wrap.offsetWidth === lastW && wrap.offsetHeight === lastH) return;
+      lastW = wrap.offsetWidth;
+      lastH = wrap.offsetHeight;
       if (lastW > 0 && lastH > 0) layout();
     }).observe($("boardWrap"));
   }
@@ -884,6 +894,7 @@ window.addEventListener("load", () => {
   setupSetupPanel();
   setupControls();
   setupTutorial();
+  setupGuide();
   layout();
   requestAnimationFrame(drawFrame);
   showOverlay(null);
@@ -896,6 +907,7 @@ window.addEventListener("load", () => {
     showOverlay("rulesPanel");
     openTutorial();
   });
+  $("titleTutorial").addEventListener("click", () => startGuide("title"));
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   }

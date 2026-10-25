@@ -3,6 +3,7 @@
 A JavaScript/HTML5 port of the Python/Tkinter game, playable on a phone browser (installable as an app).
 
 - `js/game.js` - rules engine and CPU players (port of `fire_n_ice.py`)
+- `js/tutorial.js` - illustrated Game Rules pages; `js/guided_tutorial.js` - interactive Tutorial run on the real game screen
 - `js/ui.js` - canvas rendering and touch controls
 - `index.html`, `style.css` - page and layout
 - `manifest.webmanifest`, `sw.js`, `icons/` - "Add to Home screen" + offline support
