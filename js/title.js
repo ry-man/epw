@@ -183,15 +183,12 @@ class TitleArt {
       this.line([ex + sign * 16, ey - 24, ex - sign * 4, ey - 7], TS_DARK, 6, true);
     }
     const c = this.c;
-    c.beginPath();
-    c.ellipse(x, cy + r * 0.625, r * 0.5, r * 0.325, 0, (-20 * Math.PI) / 180, (-160 * Math.PI) / 180, true);
-    c.lineWidth = 5;
-    c.strokeStyle = TS_DARK;
-    c.stroke();
-    for (let i = -2; i <= 2; i++) {
-      const tx = x + i * r * 0.16;
-      this.rect(tx - 4, cy + r * 0.52, tx + 4, cy + r * 0.62, "#ffffff", TS_DARK, 1);
-    }
+    // open, yelling mouth: dark filled oval with upper teeth and a tongue
+    const mt = cy + r * 0.42, mb = cy + r * 0.98;
+    this.oval(x - r * 0.34, mt, x + r * 0.34, mb, "#5a0f14", TS_DARK, 4);
+    this.oval(x - r * 0.2, mb - r * 0.24, x + r * 0.2, mb + r * 0.02, "#e8546a");
+    this.rect(x - r * 0.22, mt + r * 0.05, x + r * 0.22, mt + r * 0.15, "#ffffff");
+    this.oval(x - r * 0.34, mt, x + r * 0.34, mb, null, TS_DARK, 4);
     const vx = x - facing * r * 0.6, vy = cy - r * 0.62;
     for (const [dx, dy] of [[-6, -6], [6, 6], [-6, 6], [6, -6]]) this.line([vx, vy, vx + dx, vy + dy], "#c0141c", 3);
     const hy = cy - r * 0.72;

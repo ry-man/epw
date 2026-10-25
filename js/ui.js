@@ -380,6 +380,7 @@ function updateDerived() {
   let place = new Set();
   let move = new Set();
   let legal = new Set();
+  let rotate = new Set();
   let ownCitizens = new Set();
   if (human) {
     if (game.pendingPlacements.length) {
@@ -393,9 +394,10 @@ function updateDerived() {
     } else if (game.hand && game.hand in PIPE_CHANNELS && !game.actionDone) {
       const tile = game.currentTile();
       for (const p of game.pipeCandidateCells()) if (game.canPlacePipe(p, tile)) legal.add(p);
+      rotate = game.rotationOnlyCells();
     }
   }
-  derived = { version: game.version, colors, threatened, place, move, legal, ownCitizens };
+  derived = { version: game.version, colors, threatened, place, move, legal, rotate, ownCitizens };
 }
 
 function renderStatic() {
@@ -447,6 +449,32 @@ function renderStatic() {
     ctx.arc(x * cell + cell / 2, y * cell + cell / 2, Math.max(2, cell * 0.12), 0, Math.PI * 2);
     ctx.fill();
   }
+  for (const p of derived.rotate) {
+    const [x, y] = xy(p);
+    const cx = x * cell + cell / 2;
+    const cy = y * cell + cell / 2;
+    const r = Math.max(4, cell * 0.2);
+    const a0 = Math.PI * 0.15;
+    const a1 = Math.PI * 1.65;
+    ctx.strokeStyle = "rgba(46,139,87,0.85)";
+    ctx.fillStyle = "rgba(46,139,87,0.85)";
+    ctx.lineWidth = Math.max(2, cell * 0.06);
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, a0, a1);
+    ctx.stroke();
+    const ex = cx + r * Math.cos(a1);
+    const ey = cy + r * Math.sin(a1);
+    const tx = -Math.sin(a1);
+    const ty = Math.cos(a1);
+    const h = Math.max(3, cell * 0.14);
+    ctx.beginPath();
+    ctx.moveTo(ex + tx * h, ey + ty * h);
+    ctx.lineTo(ex - ty * h * 0.8, ey + tx * h * 0.8);
+    ctx.lineTo(ex + ty * h * 0.8, ey - tx * h * 0.8);
+    ctx.closePath();
+    ctx.fill();
+  }
   for (const p of game.blocks) {
     const [x, y] = xy(p);
     drawConstruction(ctx, x * cell, y * cell, cell);
@@ -471,6 +499,18 @@ function renderStatic() {
     ctx.restore();
     ctx.lineWidth = 3;
     ctx.strokeStyle = ok ? "#2e8b57" : "#c0392b";
+    ctx.strokeRect(x * cell + 1.5, y * cell + 1.5, cell - 3, cell - 3);
+  }
+  if (game.previewCell && game.pendingPlacements.length && game.placementKind === "citizen"
+    && derived.place.has(game.previewCell)) {
+    const [x, y] = xy(game.previewCell);
+    const owner = game.pendingPlacements[game.placementIndex];
+    ctx.save();
+    ctx.globalAlpha = 0.6;
+    drawCitizen(ctx, owner, x * cell + cell / 2, y * cell + cell / 2, cell * 0.39, "happy", 1, 1);
+    ctx.restore();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#2e8b57";
     ctx.strokeRect(x * cell + 1.5, y * cell + 1.5, cell - 3, cell - 3);
   }
 }
@@ -627,7 +667,8 @@ function renderHand() {
   const reveal = !game.isCpu(owner) && !game.gameOver;
   const inPool = game.pool !== null;
   const tiles = inPool ? game.pool : game.hands[owner];
-  const key = JSON.stringify([tiles, game.selected, owner, reveal, game.rotation, game.hand, game.turnDone, game.actionDone]);
+  const undoAt = reveal && game.canUndo() ? Math.min(game.undoStack[game.undoStack.length - 1].index, tiles.length) : -1;
+  const key = JSON.stringify([tiles, game.selected, owner, reveal, game.rotation, game.hand, game.turnDone, game.actionDone, undoAt]);
   const title = game.gameOver ? "Game over"
     : inPool ? `${PLAYERS[owner]} - Doubleplay: play all, any order`
       : `${PLAYERS[owner]} - ${reveal ? "your hand" : "thinking..."}`;
@@ -638,7 +679,56 @@ function renderHand() {
   handKey = key;
   const container = $("hand");
   container.innerHTML = "";
+  const addUndo = () => {
+    const btn = document.createElement("canvas");
+    btn.className = "card undo";
+    btn.title = "Undo the last tile placement";
+    container.appendChild(btn);
+    requestAnimationFrame(() => {
+      if (!game) return;
+      const size = btn.clientWidth || 70;
+      const dpr = window.devicePixelRatio || 1;
+      btn.width = Math.round(size * dpr);
+      btn.height = Math.round(size * dpr);
+      const ctx = btn.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = "#fbe9c8";
+      ctx.fillRect(0, 0, size, size);
+      ctx.strokeStyle = "#8a5a12";
+      ctx.fillStyle = "#8a5a12";
+      ctx.lineWidth = size * 0.07;
+      ctx.lineCap = "round";
+      const cx = size / 2;
+      const cy = size * 0.42;
+      const r = size * 0.22;
+      ctx.beginPath();
+      const a0 = Math.PI * 0.25;
+      const a1 = a0 - Math.PI * 1.5;
+      ctx.arc(cx, cy, r, a0, a1, true);
+      ctx.stroke();
+      // Head sits at the arc end, pointing along the counter-clockwise tangent.
+      const px = cx + r * Math.cos(a1);
+      const py = cy + r * Math.sin(a1);
+      const tx = Math.sin(a1);
+      const ty = -Math.cos(a1);
+      const nx = Math.cos(a1);
+      const ny = Math.sin(a1);
+      const h = size * 0.14;
+      ctx.beginPath();
+      ctx.moveTo(px + tx * h * 1.3, py + ty * h * 1.3);
+      ctx.lineTo(px + nx * h, py + ny * h);
+      ctx.lineTo(px - nx * h, py - ny * h);
+      ctx.closePath();
+      ctx.fill();
+      ctx.font = `bold ${size * 0.18}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("UNDO", cx, size * 0.85);
+    });
+    btn.addEventListener("click", () => game.undo());
+  };
   tiles.forEach((tile, i) => {
+    if (i === undoAt) addUndo();
     const canvas = document.createElement("canvas");
     canvas.className = `card${game.selected === i ? " selected" : ""}`;
     container.appendChild(canvas);
@@ -657,6 +747,7 @@ function renderHand() {
     });
     if (reveal) canvas.addEventListener("click", () => game.selectTile(i));
   });
+  if (undoAt === tiles.length) addUndo();
 }
 
 function renderScoreboard() {

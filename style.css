@@ -49,6 +49,7 @@ header { display: flex; gap: 6px; padding: 6px; padding-top: calc(6px + env(safe
 #hand { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fff; padding: 8px; border-radius: 0 0 8px 8px; min-height: 90px; max-height: 22vh; overflow-y: auto; }
 .card { width: 74px; height: 74px; border: 3px solid #555; border-radius: 8px; background: #f7f5ef; touch-action: manipulation; }
 .card.selected { border-color: #2e8b57; box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.45); transform: translateY(-4px); }
+.card.undo { border-color: #8a5a12; border-style: dashed; cursor: pointer; }
 
 #controls { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 8px; }
 #controls button { padding: 12px 6px; border: 0; border-radius: 8px; background: #6b6257; color: #fff; font-weight: 700; }

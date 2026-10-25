@@ -531,7 +531,9 @@ const TUTORIAL_PAGES = [
     "Even matching openings are invalid if they connect Fire and Water. The examples show two legal "
     + "placements and three common reasons a placement is illegal.",
     "Select a pipe card, tap a space to preview, press Rotate, then tap that same space "
-    + "again to place it. A flash marks each player's last move.",
+    + "again to place it. A flash marks each player's last move. Green dots show spaces where the "
+    + "selected pipe fits as-is; a green curved arrow marks spaces where it fits only after rotating. "
+    + "After placing any tile, its hand slot becomes an Undo button until you end your turn.",
   ]],
   ["Pipe Tiles", [384, 260, 96], dPipes, [
     "There are 6 kinds of pipe tile. Every tile can be rotated before placing, so a Turn can bend "
@@ -617,6 +619,7 @@ const TUTORIAL_PAGES = [
     + "and use Construction to lock a dangerous pipe down for good.",
   ]],
   ["Controls", null, null, [
+    "Citizens: tap a highlighted space to preview your new citizen, then tap the same space again to confirm.",
     "Rotate: turn the selected pipe before placing it.   Discard: enabled only when the selected tile has no legal move; it is removed and replaced immediately.",
     "End turn: finish your turn once you've played.   New game: open the menu (\u2630) to abandon this game and start another.",
     "Player settings: on the start screen, set either side (or both!) to Human or a CPU level.",

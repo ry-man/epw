@@ -113,7 +113,7 @@ const GUIDED_STEPS = [
     citizensEvent: [0],
     text: "At a citizen event you place a new citizen within 2 steps (up/down/left/right, ignoring obstacles) of one of "
       + "your factories or star pipes. The pipe next to the factory here is a star pipe, so it adds its own spawn range. "
-      + "Valid spaces are tinted - tap one.",
+      + "Valid spaces are tinted - tap one to preview the citizen, then tap the same space again to confirm.",
     goal: (g) => g.citizens.length >= 1,
     done: "Citizen placed. If no open space existed the citizen would be destroyed immediately and count for your opponent!",
   },
@@ -262,6 +262,7 @@ function guideLoad(g, step) {
   g.hand = null;
   g.rotation = 0;
   g.previewCell = null;
+  g.undoStack = [];
   g.movingCitizen = null;
   g.actionDone = false;
   g.playedCount = 0;

@@ -151,6 +151,7 @@ class Game {
     this.turnDone = false;
     this.playedCount = 0;
     this.previewCell = null;
+    this.undoStack = [];
     this.rotation = 0;
     this.actionDone = false;
     this.pendingPlacements = [];
@@ -316,6 +317,7 @@ class Game {
       return;
     }
     this.fillHand(this.activePlayer);
+    this.undoStack = [];
     this.pool = null;
     this.selected = null;
     this.hand = null;
@@ -359,6 +361,7 @@ class Game {
     const owner = this.activePlayer;
     const hand = this.hands[owner];
     hand.splice(index, 1);
+    this.undoStack = [];
     this.tilePlayCounts[owner]["Doubleplay"] += 1;
     this.pool = this.expandDoubleplays([...hand], owner);
     hand.length = 0;
@@ -421,6 +424,7 @@ class Game {
       return false;
     }
     this.tileSource().splice(this.selected, 1);
+    this.undoStack = [];
     let replacement;
     if (this.pool === null) {
       const handSize = this.hands[this.activePlayer].length;
@@ -476,12 +480,84 @@ class Game {
       this.refresh();
       return;
     }
+    if (inBounds(x, y) && this.pendingPlacements.length && this.placementKind === "citizen"
+      && this.previewCell !== position
+      && this.validCitizenCells(this.pendingPlacements[this.placementIndex]).has(position)) {
+      this.previewCell = position;
+      this.setMessage("Tap the same space again to confirm the citizen, or tap another space.");
+      this.refresh();
+      return;
+    }
     this.clickCell(position);
   }
 
   clickCell(position) {
+    const human = !this.isCpu(this.activePlayer) && !this.pendingPlacements.length;
+    const snap = human && this.hand ? this.snapshot() : null;
+    const before = this.playedCount;
     this.clickBoard(position);
     this.afterAction();
+    if (snap && this.playedCount > before) {
+      this.undoStack.push({ snap, index: snap.selected });
+      this.refresh();
+    }
+  }
+
+  snapshot() {
+    return structuredClone({
+      board: this.board, blocks: this.blocks, citizens: this.citizens, factories: this.factories,
+      hands: this.hands, pool: this.pool, tilePlayCounts: this.tilePlayCounts,
+      marks: this.marks, markEpoch: this.markEpoch, playedCount: this.playedCount,
+      turnDone: this.turnDone, highest: this.highestPipeProductCounts,
+      selected: this.selected, message: this.message,
+    });
+  }
+
+  canUndo() {
+    return !this.gameOver && !this.pendingPlacements.length && this.undoStack.length > 0
+      && !this.isCpu(this.activePlayer);
+  }
+
+  undo() {
+    if (!this.canUndo()) return false;
+    const { snap } = this.undoStack.pop();
+    this.board = snap.board;
+    this.blocks = snap.blocks;
+    this.citizens = snap.citizens;
+    this.factories = snap.factories;
+    this.hands = snap.hands;
+    this.pool = snap.pool;
+    this.tilePlayCounts = snap.tilePlayCounts;
+    this.marks = snap.marks;
+    this.markEpoch = snap.markEpoch;
+    this.playedCount = snap.playedCount;
+    this.turnDone = snap.turnDone;
+    this.highestPipeProductCounts = snap.highest;
+    this.selected = null;
+    this.hand = null;
+    this.rotation = 0;
+    this.previewCell = null;
+    this.movingCitizen = null;
+    this.actionDone = false;
+    this.effects = [];
+    this.setMessage("Tile placement undone. Select a tile to play.");
+    this.refresh();
+    return true;
+  }
+
+  // Cells where the selected pipe fits only after being rotated.
+  rotationOnlyCells() {
+    const out = new Set();
+    if (!(this.hand in PIPE_CHANNELS) || this.actionDone) return out;
+    const spawn = this.handSpawn ? this.activePlayer : null;
+    for (const position of this.pipeCandidateCells()) {
+      if (this.canPlacePipe(position, this.currentTile())) continue;
+      for (let r = 0; r < 4; r++) {
+        if (r === this.rotation) continue;
+        if (this.canPlacePipe(position, { name: this.hand, rotation: r, spawn })) { out.add(position); break; }
+      }
+    }
+    return out;
   }
 
   clickBoard(position) {
@@ -803,6 +879,7 @@ class Game {
       this.setMessage(`Citizens must be placed within ${SPAWN_RANGE} cardinal steps of one of your factories or spawning tiles (highlighted). Intervening pipes, citizens, and construction sites do not block distance; the destination must be blank and inside the starting grid until it opens.`);
       return;
     }
+    this.previewCell = null;
     const citizen = { owner, position, born: this.eventSteps };
     this.citizens.push(citizen);
     this.addEffect("place", { citizen });
@@ -904,6 +981,7 @@ class Game {
     this.hand = null;
     this.selected = null;
     this.pool = null;
+    this.undoStack = [];
     this.activePlayer = 1 - this.activePlayer;
     this.turnsInPair += 1;
     if (this.turnsInPair === 2) {
