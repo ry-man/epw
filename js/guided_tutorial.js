@@ -140,7 +140,7 @@ const GUIDED_STEPS = [
     citizens: [[1, 5, 2], [1, 5, 3]],
     hands: ["Bomb", "Straight", "Turn"],
     text: "Now you are the Ice team and your citizens are threatened - the Fire pipe points at them. A Bomb destroys any "
-      + "one pipe. Select the Bomb and tap a Fire pipe to cut it off.",
+      + "one non-star pipe; starred spawning-point pipes are indestructible. Select the Bomb and tap a Fire pipe to cut it off.",
     goal: (g) => g.board.size < 2,
     done: "Pipe destroyed - nothing flows past the break, and your citizens are safe.",
   },
@@ -151,8 +151,9 @@ const GUIDED_STEPS = [
     citizens: [[1, 5, 2], [1, 5, 3]],
     hands: ["Construction", "Bomb", "Move 1"],
     cells: [[3, 2], [4, 2]],
-    text: "Construction replaces a pipe with a permanent barricade. First tap the pipe touching the factory - it is "
-      + "refused, because construction can't replace a pipe opening directly onto a factory. Then build over the other pipe.",
+    text: "Construction replaces an eligible non-star pipe with a permanent barricade. Starred spawning-point pipes are "
+      + "indestructible. First tap the pipe touching the factory - it is refused, because construction can't replace a pipe "
+      + "opening directly onto a factory. Then build over the other pipe.",
     goal: (g) => g.blocks.size >= 1,
     done: "A construction site can never be built on, moved onto, bombed or rebuilt.",
   },
@@ -221,8 +222,9 @@ const GUIDED_STEPS = [
   },
   {
     title: "You're Ready!",
-    text: "Tips: keep citizens spread out and away from pipe ends, bomb or build over dangerous pipes, and use Move tiles "
-      + "to dodge. Press Finish and start a game - Game Rules is always there for reference.",
+    text: "Tips: keep citizens spread out and away from pipe ends, bomb or build over dangerous non-star pipes, and use Move tiles "
+      + "to dodge. Starred spawning-point pipes are indestructible. Press Finish and start a game - Game Rules is always there "
+      + "for reference.",
   },
 ];
 

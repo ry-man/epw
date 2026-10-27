@@ -563,13 +563,16 @@ const TUTORIAL_PAGES = [
     + "block the distance.",
     "The destination must be blank. During the early game, it must also be inside the starting grid.",
     "If there is no open space, that citizen is destroyed immediately and counts for your opponent!",
-    "If a star pipe is destroyed or replaced, it no longer provides a spawn point.",
+    "Starred spawning-point pipes are indestructible: bombs cannot destroy them and Construction "
+    + "cannot replace them.",
   ]],
   ["Bombs and Construction", [512, 192, 64], dBomb, [
-    "Bomb: destroys any one pipe. There are 15 Bomb tiles in each deck.",
-    "Construction: replaces any pipe with a permanent barricade. Nothing can be built or moved onto it "
+    "Bomb: destroys any one non-star pipe. Spawning-point pipes marked with a star are indestructible. "
+    + "There are 15 Bomb tiles in each deck.",
+    "Construction: replaces any eligible non-star pipe with a permanent barricade. Nothing can be built or moved onto it "
     + "for the rest of the game, and neither bombs nor other construction tiles can remove it. It can't "
-    + "replace a pipe whose opening connects directly to a factory. Each deck has 5 Construction tiles.",
+    + "replace a spawning-point pipe or a pipe whose opening connects directly to a factory. Each deck "
+    + "has 5 Construction tiles.",
   ]],
   ["Moving Citizens", [448, 224, 56], dMove, [
     "Move 1, Move 2 and Move 3 let you move one of your citizens up to that many spaces.",
@@ -619,8 +622,8 @@ const TUTORIAL_PAGES = [
     + "turns it would have survived if it lived to the end.",
     "The final summary also records each player's Decimal Alive Score, tiles played, each team's final and peak number of "
     + "product-carrying pipes, and the most citizens destroyed in one turn.",
-    "Tips: use bombs to cut off an enemy pipe, keep your citizens spread out and away from pipe ends, "
-    + "and use Construction to lock a dangerous pipe down for good.",
+    "Tips: use bombs to cut off an enemy non-star pipe, keep your citizens spread out and away from pipe ends, "
+    + "and use Construction to lock a dangerous non-star pipe down for good.",
   ]],
   ["Controls", null, null, [
     "Citizens: tap a highlighted space to preview your new citizen, then tap the same space again to confirm.",

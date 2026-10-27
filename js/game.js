@@ -233,6 +233,11 @@ class Game {
     return SIDES.some((side) => ports.has(side) && this.factories.has(neighbor(position, side)));
   }
 
+  isSpawnPointPipe(position) {
+    const tile = this.board.get(position);
+    return tile !== undefined && tile.spawn !== null && tile.spawn !== undefined;
+  }
+
   currentTile() {
     return { name: this.hand, rotation: this.rotation, spawn: this.handSpawn ? this.activePlayer : null };
   }
@@ -289,8 +294,10 @@ class Game {
       }
       return false;
     }
-    if (name === "Bomb") return this.board.size > 0;
-    if (name === "Construction") return [...this.board.keys()].some((p) => !this.factoryFed(p));
+    if (name === "Bomb") return [...this.board.keys()].some((p) => !this.isSpawnPointPipe(p));
+    if (name === "Construction") {
+      return [...this.board.keys()].some((p) => !this.isSpawnPointPipe(p) && !this.factoryFed(p));
+    }
     if (name.startsWith("Move ")) {
       const distance = Number(name.split(" ")[1]);
       return this.citizens.some(
@@ -590,16 +597,22 @@ class Game {
       }
     } else if (this.hand === "Bomb") {
       if (this.board.has(position)) {
-        this.board.delete(position);
-        this.mark(position, "#222222");
-        this.actionDone = true;
-        this.setMessage("Pipe destroyed.");
+        if (this.isSpawnPointPipe(position)) {
+          this.setMessage("Spawning-point pipes cannot be destroyed.");
+        } else {
+          this.board.delete(position);
+          this.mark(position, "#222222");
+          this.actionDone = true;
+          this.setMessage("Pipe destroyed.");
+        }
       } else {
         this.setMessage("Choose a pipe tile to destroy.");
       }
     } else if (this.hand === "Construction") {
       if (!this.board.has(position)) {
         this.setMessage("Choose a pipe tile to build over.");
+      } else if (this.isSpawnPointPipe(position)) {
+        this.setMessage("Construction cannot replace a spawning-point pipe.");
       } else if (this.factoryFed(position)) {
         this.setMessage("Construction cannot replace a pipe coming directly out of a factory.");
       } else {
@@ -1215,16 +1228,13 @@ class Game {
     return maxBy(cells, score);
   }
 
-  // Bomb / construction target ordering: enemy spawn points, then enemy-fed pipes.
+  // Bomb / construction target ordering by strategic value.
   cpuPipeTargets(owner, positions) {
     if (!this.cpuSmart()) return shuffle([...positions]);
     const enemyFed = this.enemyFedCells(owner);
     const enemyCitizens = this.citizens.filter((c) => c.owner !== owner).map((c) => c.position);
     const priority = (position) => {
-      const spawn = this.board.get(position).spawn;
-      if (spawn === owner) return 99;
       let value = 0;
-      if (spawn !== null) value -= 10;
       if (enemyFed.has(position)) value -= 3;
       if (enemyCitizens.length) value += 0.01 * Math.min(...enemyCitizens.map((e) => manhattan(position, e)));
       return value + Math.random() * 0.5;
@@ -1259,13 +1269,11 @@ class Game {
       this.selectTile(order[0]);
       return;
     }
-    const enemySpawns = [...this.board.values()].some((t) => t.spawn !== null && t.spawn !== owner);
     const danger = this.exposedCells(FACTORIES_BY_OWNER[1 - owner]);
     const threatened = this.citizens.some((c) => c.owner === owner && danger.has(c.position));
     const rank = (i) => {
       const name = source[i].name;
       if (name.startsWith("Move ") && threatened) return -2;
-      if ((name === "Bomb" || name === "Construction") && enemySpawns) return -1;
       return 0;
     };
     if (smart) candidates = candidates.map((i) => [rank(i), i]).sort((a, b) => a[0] - b[0]).map((e) => e[1]);
@@ -1364,7 +1372,8 @@ class Game {
       this.clickCell(best[0]);
     } else if (hand === "Bomb" || hand === "Construction") {
       const construction = hand === "Construction";
-      const candidates = construction ? [...this.board.keys()].filter((p) => !this.factoryFed(p)) : [...this.board.keys()];
+      const candidates = [...this.board.keys()].filter((p) => !this.isSpawnPointPipe(p)
+        && (!construction || !this.factoryFed(p)));
       const targets = this.cpuPipeTargets(owner, candidates);
       const fallback = targets.length ? targets[0] : null;
       for (const position of targets.slice(0, sample)) {
