@@ -140,6 +140,8 @@ class Game {
     this.decks = [Game.makeDeck(), Game.makeDeck()];
     this.deckTotal = this.decks[0].length;
     this.activePlayer = 0;
+    this.swapTurnOrder = false;
+    this.cycleFirst = 0;
     this.turnsInPair = 0;
     this.eventPosition = 1;
     this.eventSteps = 0;
@@ -315,6 +317,11 @@ class Game {
     if (this.decks.every((d) => !d.length) && this.hands.every((h) => !h.length)) {
       this.finishGame();
       return;
+    }
+    if (this.swapTurnOrder) {
+      // A new event cycle starts: the player who moved last in the previous cycle moves first.
+      this.swapTurnOrder = false;
+      this.activePlayer = 1 - this.activePlayer;
     }
     this.fillHand(this.activePlayer);
     this.undoStack = [];
@@ -1001,6 +1008,8 @@ class Game {
     else if (event === 6 || event === 8) this.scheduleCitizens([0]);
     else if (event === 7 || event === 9) this.scheduleCitizens([1]);
     else if (event === 10) {
+      this.swapTurnOrder = true;
+      this.cycleFirst = this.activePlayer;
       this.produce();
       this.afterProduction();
     } else this.beginTurn();

@@ -428,6 +428,7 @@ function dCycle(p) {
   p.text(cx, cy + 12, "CYCLE", 12, T_INK, true, "center", true);
   const lines = [
     [null, "Counter moves 1 space each time\nboth players have taken a turn."],
+    [null, "The Cycle Count boxes are labeled FF or II:\nwho takes the first turn that cycle."],
     ["both", "Space 4: BOTH place a citizen"],
     [T_FIRE, "Spaces 6 & 8: Fire Folk place a citizen"],
     [T_ICE, "Spaces 7 & 9: Ice Inhabitants place a citizen"],
@@ -589,6 +590,9 @@ const TUTORIAL_PAGES = [
     + "how many full cycles have been played and which cycle triggers what.",
     "If both players place a citizen, whoever has more living citizens goes first; on a tie, the player "
     + "whose turn just ended goes first. Space 10 is the production event.",
+    "Turn order alternates each cycle: after production, the player who took the last turn of the cycle takes "
+    + "the first turn of the next one, so the two players take turns having the final turn before production. "
+    + "The Cycle Count boxes are each labeled \"FF\" or \"II\" to show who goes first in that cycle.",
   ]],
   ["Production and Chain Destruction", [504, 224, 56], dProduction, [
     "On space 10 every factory produces. Fire or water flows through all connected pipes, and every "

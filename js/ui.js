@@ -783,7 +783,7 @@ function renderCycle() {
       chip.className = "count";
       if (n === total) chip.classList.add("end");
       else if (n >= FULL_BOARD_CYCLES && (n - FULL_BOARD_CYCLES) % FACTORY_CYCLE_INTERVAL === 0) chip.classList.add("key");
-      chip.innerHTML = `<b>${n}</b>`;
+      chip.innerHTML = `<b>${n}</b><i></i>`;
       counts.appendChild(chip);
     }
   }
@@ -791,6 +791,10 @@ function renderCycle() {
   [...counts.children].forEach((chip, i) => {
     chip.classList.toggle("done", i < done);
     chip.classList.toggle("now", i === done && !game.gameOver);
+    const first = (((game.cycleFirst + i - done) % 2) + 2) % 2;
+    const tag = chip.querySelector("i");
+    tag.textContent = first === 0 ? "FF" : "II";
+    tag.className = first === 0 ? "ff" : "ii";
   });
 }
 

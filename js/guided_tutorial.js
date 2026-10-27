@@ -47,7 +47,9 @@ const GUIDED_STEPS = [
   {
     title: "The Event Cycle",
     spot: ["dial"],
-    text: "The top row is the Event Cycle. It advances one space after BOTH players have taken a turn, then that space's "
+    text: "The top row is the Event Cycle. In the Cycle Count boxes below it, \"FF\" or \"II\" shows which player takes the first turn of "
+      + "each cycle; the order swaps after every production, so the player who moved last goes first next cycle. "
+      + "The dial advances one space after BOTH players have taken a turn, then that space's "
       + "event happens:\n\u2022 Spaces 1, 2, 3 and 5: nothing - just keep building.\n\u2022 Space 4 (Both): each team places a citizen.\n"
       + "\u2022 Spaces 6 and 8 (FF): Fire Folk place a citizen.\n\u2022 Spaces 7 and 9 (II): Ice Inhabitants place a citizen.\n"
       + "\u2022 Space 10 (Prod): both factories produce - Fire and Water flow down every connected pipe and destroy "
@@ -195,7 +197,7 @@ const GUIDED_STEPS = [
       + "each. Whoever has more living citizens places first (a tie goes to the player who just finished).",
     goal: (g) => g.eventPosition === 5 && !g.pendingPlacements.length,
     done: "That's one slot of the Event Cycle. Spaces 6-9 give citizens to a single team and space 10 is production, after which "
-      + "the cycle restarts.",
+      + "the cycle restarts and the turn order swaps (the player who moved last goes first in the next cycle).",
   },
   {
     title: "New Factories",
@@ -251,6 +253,8 @@ function guideLoad(g, step) {
   g.placementIndex = 0;
   g.gameOver = false;
   g.activePlayer = step.active || 0;
+  g.cycleFirst = g.activePlayer;
+  g.swapTurnOrder = false;
   g.turnsInPair = 0;
   g.eventPosition = step.position || 1;
   g.eventSteps = step.steps || 0;

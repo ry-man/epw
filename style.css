@@ -44,6 +44,10 @@ header { display: flex; gap: 6px; padding: 6px; padding-top: calc(6px + env(safe
 .count.key.done { background: #d4a017; color: #fff; }
 .count.end { border-color: #111; background: #bbb; color: #111; }
 .count.end.done { background: #111; color: #fff; }
+.count i { display: block; font-style: normal; font-weight: 700; font-size: 0.55rem; line-height: 1; }
+.count i.ff { color: #c0392b; }
+.count i.ii { color: #2874a6; }
+.count.done i { color: #fff; }
 
 #handTitle { color: #fff; font-weight: 700; padding: 4px 8px; border-radius: 6px 6px 0 0; font-size: 0.85rem; background: #555; margin-bottom: -8px; }
 #hand { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; background: #fff; padding: 8px; border-radius: 0 0 8px 8px; min-height: 90px; max-height: 22vh; overflow-y: auto; }
