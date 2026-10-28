@@ -150,10 +150,10 @@ const GUIDED_STEPS = [
     board: FIRE_LINE,
     citizens: [[1, 5, 2], [1, 5, 3]],
     hands: ["Construction", "Bomb", "Move 1"],
-    cells: [[3, 2], [4, 2]],
-    text: "Construction replaces an eligible non-star pipe with a permanent barricade. Starred spawning-point pipes are "
-      + "indestructible. First tap the pipe touching the factory - it is refused, because construction can't replace a pipe "
-      + "opening directly onto a factory. Then build over the other pipe.",
+    cells: [[3, 2], [4, 2], [5, 2]],
+    text: "Construction places a permanent barricade on an empty space or over a non-star pipe. It cannot be placed next "
+      + "to an opponent's factory, on a spawning-point pipe, or on an existing barricade. Tap the highlighted empty space "
+      + "to block it.",
     goal: (g) => g.blocks.size >= 1,
     done: "A construction site can never be built on, moved onto, bombed or rebuilt.",
   },

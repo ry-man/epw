@@ -568,11 +568,11 @@ const TUTORIAL_PAGES = [
   ]],
   ["Bombs and Construction", [512, 192, 64], dBomb, [
     "Bomb: destroys any one non-star pipe. Spawning-point pipes marked with a star are indestructible. "
-    + "There are 15 Bomb tiles in each deck.",
-    "Construction: replaces any eligible non-star pipe with a permanent barricade. Nothing can be built or moved onto it "
-    + "for the rest of the game, and neither bombs nor other construction tiles can remove it. It can't "
-    + "replace a spawning-point pipe or a pipe whose opening connects directly to a factory. Each deck "
-    + "has 5 Construction tiles.",
+    + "There are 20 Bomb tiles in each deck.",
+    "Construction: place on an empty space or replace any non-star pipe with a permanent barricade. "
+    + "It cannot be placed next to an opponent's factory or on a spawning-point pipe. Nothing can be "
+    + "built or moved onto it for the rest of the game, and neither bombs nor other construction tiles "
+    + "can remove it. Each deck has 7 Construction tiles.",
   ]],
   ["Moving Citizens", [448, 224, 56], dMove, [
     "Move 1, Move 2 and Move 3 let you move one of your citizens up to that many spaces.",
@@ -623,7 +623,7 @@ const TUTORIAL_PAGES = [
     "The final summary also records each player's Decimal Alive Score, tiles played, each team's final and peak number of "
     + "product-carrying pipes, and the most citizens destroyed in one turn.",
     "Tips: use bombs to cut off an enemy non-star pipe, keep your citizens spread out and away from pipe ends, "
-    + "and use Construction to lock a dangerous non-star pipe down for good.",
+    + "and use Construction to block an empty route or lock a dangerous non-star pipe down for good.",
   ]],
   ["Controls", null, null, [
     "Citizens: tap a highlighted space to preview your new citizen, then tap the same space again to confirm.",

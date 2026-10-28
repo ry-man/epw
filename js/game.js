@@ -180,8 +180,8 @@ class Game {
       for (let i = 0; i < count; i++) deck.push({ name, spawn: i < spawns });
     }
     const add = (name, count) => { for (let i = 0; i < count; i++) deck.push({ name, spawn: false }); };
-    add("Bomb", 15);
-    add("Construction", 5);
+    add("Bomb", 20);
+    add("Construction", 7);
     add("Move 1", 10);
     add("Move 2", 7);
     add("Move 3", 4);
@@ -228,14 +228,21 @@ class Game {
       || this.citizens.some((c) => c.position === position);
   }
 
-  factoryFed(position) {
-    const ports = tileInfo(this.board.get(position)).ports;
-    return SIDES.some((side) => ports.has(side) && this.factories.has(neighbor(position, side)));
-  }
-
   isSpawnPointPipe(position) {
     const tile = this.board.get(position);
     return tile !== undefined && tile.spawn !== null && tile.spawn !== undefined;
+  }
+
+  canPlaceConstruction(position, owner = this.activePlayer) {
+    const [x, y] = xy(position);
+    if (!inBounds(x, y) || this.blocks.has(position) || this.factories.has(position)) return false;
+    if (this.startingGridLocked() && !this.inStartingGrid(x, y)) return false;
+    if (this.citizens.some((c) => c.position === position)) return false;
+    if (this.isSpawnPointPipe(position)) return false;
+    return SIDES.every((side) => {
+      const adjacentFactory = this.factories.get(neighbor(position, side));
+      return adjacentFactory === undefined || FACTORY_OWNER[adjacentFactory] === owner;
+    });
   }
 
   currentTile() {
@@ -296,7 +303,12 @@ class Game {
     }
     if (name === "Bomb") return [...this.board.keys()].some((p) => !this.isSpawnPointPipe(p));
     if (name === "Construction") {
-      return [...this.board.keys()].some((p) => !this.isSpawnPointPipe(p) && !this.factoryFed(p));
+      for (let y = 0; y < BOARD_SIZE; y++) {
+        for (let x = 0; x < BOARD_SIZE; x++) {
+          if (this.canPlaceConstruction(pos(x, y))) return true;
+        }
+      }
+      return false;
     }
     if (name.startsWith("Move ")) {
       const distance = Number(name.split(" ")[1]);
@@ -609,12 +621,17 @@ class Game {
         this.setMessage("Choose a pipe tile to destroy.");
       }
     } else if (this.hand === "Construction") {
-      if (!this.board.has(position)) {
-        this.setMessage("Choose a pipe tile to build over.");
-      } else if (this.isSpawnPointPipe(position)) {
-        this.setMessage("Construction cannot replace a spawning-point pipe.");
-      } else if (this.factoryFed(position)) {
-        this.setMessage("Construction cannot replace a pipe coming directly out of a factory.");
+      if (!this.canPlaceConstruction(position)) {
+        if (this.isSpawnPointPipe(position)) {
+          this.setMessage("Construction cannot replace a spawning-point pipe.");
+        } else if (SIDES.some((side) => {
+          const adjacentFactory = this.factories.get(neighbor(position, side));
+          return adjacentFactory !== undefined && FACTORY_OWNER[adjacentFactory] !== this.activePlayer;
+        })) {
+          this.setMessage("Construction cannot be placed next to an opponent's factory.");
+        } else {
+          this.setMessage("Choose an empty space or eligible pipe for construction.");
+        }
       } else {
         this.board.delete(position);
         this.blocks.add(position);
@@ -1228,7 +1245,7 @@ class Game {
     return maxBy(cells, score);
   }
 
-  // Bomb / construction target ordering by strategic value.
+  // Order bomb and construction targets by strategic value.
   cpuPipeTargets(owner, positions) {
     if (!this.cpuSmart()) return shuffle([...positions]);
     const enemyFed = this.enemyFedCells(owner);
@@ -1372,8 +1389,10 @@ class Game {
       this.clickCell(best[0]);
     } else if (hand === "Bomb" || hand === "Construction") {
       const construction = hand === "Construction";
-      const candidates = [...this.board.keys()].filter((p) => !this.isSpawnPointPipe(p)
-        && (!construction || !this.factoryFed(p)));
+      const candidates = construction
+        ? Array.from({ length: BOARD_SIZE * BOARD_SIZE }, (_, i) => pos(i % BOARD_SIZE, Math.floor(i / BOARD_SIZE)))
+          .filter((p) => this.canPlaceConstruction(p, owner))
+        : [...this.board.keys()].filter((p) => !this.isSpawnPointPipe(p));
       const targets = this.cpuPipeTargets(owner, candidates);
       const fallback = targets.length ? targets[0] : null;
       for (const position of targets.slice(0, sample)) {
@@ -1382,7 +1401,7 @@ class Game {
         if (construction) this.blocks.add(position);
         const score = this.evaluate(owner) + this.cpuNoise();
         if (construction) this.blocks.delete(position);
-        this.board.set(position, tile);
+        if (tile !== undefined) this.board.set(position, tile);
         if (score > bestScore) { best = position; bestScore = score; }
       }
       if (best === null) best = fallback;
